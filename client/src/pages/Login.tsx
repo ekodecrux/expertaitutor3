@@ -70,7 +70,7 @@ export default function Login() {
               <GraduationCap className="h-10 w-10 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Welcome to ExpertAitutor</CardTitle>
+          <CardTitle className="text-2xl font-bold">Welcome to ACES-AIProfessor</CardTitle>
           <CardDescription>Sign in to access your personalized learning platform</CardDescription>
         </CardHeader>
         <CardContent>

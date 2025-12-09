@@ -450,3 +450,97 @@
 - [ ] Build admin panel UI for class management
 - [ ] Add content library admin interface
 - [ ] Create subscription management dashboard
+
+
+## Phase 34: ACES-AIProfessor Rebranding (COMPLETED)
+- [x] Update all "ExpertAitutor" references to "ACES-AIProfessor"
+- [x] Update email domains from @expertaitutor.com to @acesaiprofessor.com
+- [x] Update branding in AppLayout component
+- [x] Update branding in Home landing page
+- [x] Update branding in seed scripts (seed-simple.mjs, seed-users.mjs)
+
+## Phase 35: Admin Backend APIs Implementation (COMPLETED)
+- [x] Implement admin.getClasses endpoint
+- [x] Implement admin.createClass endpoint
+- [x] Implement admin.updateClass endpoint
+- [x] Implement admin.deleteClass endpoint
+- [x] Implement admin.getSections endpoint
+- [x] Implement admin.createSection endpoint
+- [x] Implement admin.updateSection endpoint
+- [x] Implement admin.deleteSection endpoint
+- [x] Implement admin.getStudents endpoint
+- [x] Implement admin.createStudent endpoint
+- [x] Implement admin.updateStudent endpoint
+- [x] Implement admin.deleteStudent endpoint
+- [x] Implement admin.getTeachers endpoint
+- [x] Implement admin.createTeacher endpoint
+- [x] Implement admin.updateTeacher endpoint
+- [x] Implement admin.deleteTeacher endpoint
+- [x] Implement admin.enrollStudent endpoint
+- [x] Implement admin.bulkImportCSV endpoint
+- [x] Add CSV parsing and validation
+- [x] Add error handling and rollback for bulk operations
+- [ ] Create vitest tests for all admin endpoints
+
+## Phase 36: Content Library Aggregation Implementation (IN PROGRESS)
+- [ ] Create content_sources table for tracking scraped sources
+- [ ] Create content_approval_queue table for admin review
+- [ ] Build NCERT textbook scraper
+- [ ] Build CBSE past papers scraper
+- [ ] Build JEE/NEET resources scraper
+- [ ] Build YouTube educational video aggregator
+- [ ] Implement content metadata extraction (curriculum, subject, topic, difficulty)
+- [ ] Build admin approval workflow UI
+- [ ] Add content search and filtering
+- [ ] Implement content categorization system
+- [ ] Add duplicate detection for scraped content
+- [ ] Create content quality scoring system
+- [ ] Build automated content updates (daily/weekly scraping)
+- [ ] Add content usage analytics
+- [ ] Create vitest tests for scraping and approval workflows
+
+## Phase 37: Stripe Payment Gateway Integration (IN PROGRESS)
+- [ ] Install Stripe SDK (npm install stripe @stripe/stripe-js)
+- [ ] Create Stripe account and get API keys
+- [ ] Add Stripe secret key to environment variables
+- [ ] Implement payment.createCheckoutSession endpoint
+- [ ] Implement payment.getSubscriptionStatus endpoint
+- [ ] Implement payment.cancelSubscription endpoint
+- [ ] Implement payment.updatePaymentMethod endpoint
+- [ ] Build Stripe webhook handler for payment events
+- [ ] Handle subscription.created webhook
+- [ ] Handle subscription.updated webhook
+- [ ] Handle subscription.deleted webhook
+- [ ] Handle payment_intent.succeeded webhook
+- [ ] Handle payment_intent.failed webhook
+- [ ] Build payment UI for Super Admin (institute management)
+- [ ] Build payment UI for Institution Admin (branch payments)
+- [ ] Build payment UI for Parents (student fees)
+- [ ] Add payment history page
+- [ ] Implement invoice generation and download
+- [ ] Add payment method management UI
+- [ ] Create subscription upgrade/downgrade flows
+- [ ] Add trial period handling
+- [ ] Implement usage-based billing tracking
+- [ ] Create vitest tests for payment endpoints and webhooks
+
+## Phase 37: International Exam Content Scrapers (COMPLETED)
+- [x] Add GMAT scraper for quantitative, verbal, and analytical writing resources
+- [x] Add GRE scraper for vocabulary, quantitative reasoning, and analytical writing
+- [x] Add TOEFL scraper for reading, listening, speaking, and writing materials
+- [x] Add SAT scraper for math, reading, and writing practice tests
+- [x] Add ACT scraper for math, science, and reading materials
+- [x] Add IELTS scraper for academic/general reading, writing, speaking, and listening
+- [x] Update runScraper router to support all international exams
+
+
+## Phase 38: Content Library Backend Implementation (COMPLETED)
+- [x] Create content router with tRPC endpoints
+- [x] Implement content sources CRUD operations
+- [x] Implement scraper execution endpoint
+- [x] Implement scraping logs retrieval
+- [x] Implement approval queue management endpoints
+- [x] Implement content approval workflow (approve/reject/needs review)
+- [x] Implement content library browsing endpoints
+- [x] Implement content statistics dashboard endpoint
+- [x] Add content router to main router export

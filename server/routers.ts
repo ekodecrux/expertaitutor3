@@ -9,6 +9,8 @@ import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
 import * as db from "./db";
 import * as auth from "./auth";
+import { adminRouter } from "./routers-admin";
+import { contentRouter } from "./routers-content";
 
 // ============= RBAC MIDDLEWARE =============
 
@@ -609,31 +611,7 @@ Provide a week-by-week breakdown with topics to cover.`,
       }),
   }),
 
-  // ============= ADMIN FEATURES =============
-  
-  admin: router({
-    getInstitutions: adminProcedure.query(async () => {
-      return await db.getAllInstitutions();
-    }),
-    
-    getAllUsers: adminProcedure.query(async () => {
-      return await db.getAllUsers();
-    }),
-    
-    createInstitution: adminProcedure
-      .input(z.object({
-        name: z.string(),
-        type: z.enum(['school', 'coaching_center', 'university', 'other']),
-        country: z.string().optional(),
-        address: z.string().optional(),
-        contactEmail: z.string().optional(),
-        contactPhone: z.string().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        await db.createInstitution(input);
-        return { success: true };
-      }),
-  }),
+
 
   // ============= NOTIFICATIONS =============
   
@@ -651,6 +629,14 @@ Provide a week-by-week breakdown with topics to cover.`,
         return { success: true };
       }),
   }),
+
+  // ============= ADMIN MANAGEMENT =============
+  
+  admin: adminRouter,
+
+  // ============= CONTENT LIBRARY =============
+  
+  content: contentRouter,
 
   // ============= FILE UPLOAD =============
   

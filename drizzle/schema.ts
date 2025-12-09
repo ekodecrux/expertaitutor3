@@ -652,3 +652,100 @@ export const subscriptionUsage = mysqlTable("subscription_usage", {
 
 export type SubscriptionUsage = typeof subscriptionUsage.$inferSelect;
 export type InsertSubscriptionUsage = typeof subscriptionUsage.$inferInsert;
+
+/**
+ * Content sources for tracking scraped external resources
+ */
+export const contentSources = mysqlTable("content_sources", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(), // "NCERT", "CBSE", "JEE Main", etc.
+  sourceType: mysqlEnum("source_type", ["website", "pdf", "video", "api"]).notNull(),
+  baseUrl: text("baseUrl"),
+  scrapingConfig: json("scrapingConfig").$type<{
+    selectors?: Record<string, string>;
+    apiEndpoint?: string;
+    apiKey?: string;
+    scheduleFrequency?: string;
+  }>(),
+  curriculum: varchar("curriculum", { length: 100 }), // CBSE, ICSE, JEE, NEET, etc.
+  subjects: json("subjects").$type<string[]>(),
+  lastScrapedAt: timestamp("lastScrapedAt"),
+  nextScheduledScrape: timestamp("nextScheduledScrape"),
+  status: mysqlEnum("status", ["active", "paused", "error"]).default("active"),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  curriculumIdx: index("source_curriculum_idx").on(table.curriculum),
+  statusIdx: index("source_status_idx").on(table.status),
+}));
+
+export type ContentSource = typeof contentSources.$inferSelect;
+export type InsertContentSource = typeof contentSources.$inferInsert;
+
+/**
+ * Content approval queue for admin review
+ */
+export const contentApprovalQueue = mysqlTable("content_approval_queue", {
+  id: int("id").autoincrement().primaryKey(),
+  sourceId: int("sourceId").notNull(),
+  contentType: mysqlEnum("content_type", ["note", "video", "slide", "simulation", "question", "past_paper"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  content: text("content"),
+  url: text("url"),
+  fileKey: text("fileKey"),
+  metadata: json("metadata").$type<{
+    curriculum?: string;
+    subject?: string;
+    topic?: string;
+    grade?: string;
+    difficulty?: string;
+    examTags?: string[];
+    author?: string;
+    publishDate?: string;
+    fileSize?: number;
+    duration?: number;
+  }>(),
+  autoCategorizationScore: int("autoCategorizationScore"), // 0-100 confidence
+  duplicateCheckStatus: mysqlEnum("duplicate_check_status", ["pending", "unique", "duplicate"]).default("pending"),
+  duplicateOfId: int("duplicateOfId"),
+  qualityScore: int("qualityScore"), // 0-100
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "needs_review"]).default("pending"),
+  reviewedBy: int("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  rejectionReason: text("rejectionReason"),
+  approvedContentItemId: int("approvedContentItemId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  sourceIdx: index("queue_source_idx").on(table.sourceId),
+  statusIdx: index("queue_status_idx").on(table.status),
+  reviewerIdx: index("queue_reviewer_idx").on(table.reviewedBy),
+}));
+
+export type ContentApprovalQueue = typeof contentApprovalQueue.$inferSelect;
+export type InsertContentApprovalQueue = typeof contentApprovalQueue.$inferInsert;
+
+/**
+ * Scraping logs for monitoring and debugging
+ */
+export const scrapingLogs = mysqlTable("scraping_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  sourceId: int("sourceId").notNull(),
+  status: mysqlEnum("status", ["started", "success", "partial", "failed"]).notNull(),
+  itemsFound: int("itemsFound").default(0),
+  itemsAdded: int("itemsAdded").default(0),
+  itemsSkipped: int("itemsSkipped").default(0),
+  errorMessage: text("errorMessage"),
+  executionTimeSeconds: int("executionTimeSeconds"),
+  metadata: json("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  sourceIdx: index("log_source_idx").on(table.sourceId),
+  statusIdx: index("log_status_idx").on(table.status),
+  createdIdx: index("log_created_idx").on(table.createdAt),
+}));
+
+export type ScrapingLog = typeof scrapingLogs.$inferSelect;
+export type InsertScrapingLog = typeof scrapingLogs.$inferInsert;

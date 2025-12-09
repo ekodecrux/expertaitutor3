@@ -26,11 +26,11 @@ const hashedPassword = await bcrypt.hash("demo123", 10);
 
 // Create demo students
 const students = [
-  { email: "student1@expertaitutor.com", name: "Rahul Sharma" },
-  { email: "student2@expertaitutor.com", name: "Priya Patel" },
-  { email: "student3@expertaitutor.com", name: "Amit Kumar" },
-  { email: "student4@expertaitutor.com", name: "Sneha Reddy" },
-  { email: "student5@expertaitutor.com", name: "Arjun Singh" },
+  { email: "student1@acesaiprofessor.com", name: "Rahul Sharma" },
+  { email: "student2@acesaiprofessor.com", name: "Priya Patel" },
+  { email: "student3@acesaiprofessor.com", name: "Amit Kumar" },
+  { email: "student4@acesaiprofessor.com", name: "Sneha Reddy" },
+  { email: "student5@acesaiprofessor.com", name: "Arjun Singh" },
 ];
 
 for (const student of students) {
@@ -44,9 +44,9 @@ for (const student of students) {
 
 // Create demo teachers
 const teachers = [
-  { email: "teacher1@expertaitutor.com", name: "Dr. Rajesh Verma" },
-  { email: "teacher2@expertaitutor.com", name: "Prof. Meena Iyer" },
-  { email: "teacher3@expertaitutor.com", name: "Mr. Suresh Nair" },
+  { email: "teacher1@acesaiprofessor.com", name: "Dr. Rajesh Verma" },
+  { email: "teacher2@acesaiprofessor.com", name: "Prof. Meena Iyer" },
+  { email: "teacher3@acesaiprofessor.com", name: "Mr. Suresh Nair" },
 ];
 
 for (const teacher of teachers) {
@@ -60,8 +60,8 @@ for (const teacher of teachers) {
 
 // Create demo parents
 const parents = [
-  { email: "parent1@expertaitutor.com", name: "Mr. Ramesh Gupta" },
-  { email: "parent2@expertaitutor.com", name: "Mrs. Lakshmi Menon" },
+  { email: "parent1@acesaiprofessor.com", name: "Mr. Ramesh Gupta" },
+  { email: "parent2@acesaiprofessor.com", name: "Mrs. Lakshmi Menon" },
 ];
 
 for (const parent of parents) {
@@ -78,7 +78,7 @@ await connection.execute(
   `INSERT INTO users (openId, name, email, role, passwordHash, createdAt, updatedAt, lastSignedIn) 
    VALUES (?, ?, ?, 'admin', ?, NOW(), NOW(), NOW())
    ON DUPLICATE KEY UPDATE email = email`,
-  ["admin-demo", "Demo Admin", "admin@expertaitutor.com", hashedPassword]
+  ["admin-demo", "Demo Admin", "admin@acesaiprofessor.com", hashedPassword]
 );
 
 console.log("✅ Users created");
@@ -117,13 +117,13 @@ if (tableNames.includes("student_profiles")) {
 
 console.log("\n🎉 Database seeding completed successfully!");
 console.log("\n📧 Demo Login Credentials:");
-console.log("   Email: student1@expertaitutor.com");
+console.log("   Email: student1@acesaiprofessor.com");
 console.log("   Password: demo123");
 console.log("\n   Other accounts:");
-console.log("   - Students: student2@expertaitutor.com, student3@expertaitutor.com, etc.");
-console.log("   - Teachers: teacher1@expertaitutor.com, teacher2@expertaitutor.com, etc.");
-console.log("   - Parents: parent1@expertaitutor.com, parent2@expertaitutor.com");
-console.log("   - Admin: admin@expertaitutor.com");
+console.log("   - Students: student2@acesaiprofessor.com, student3@acesaiprofessor.com, etc.");
+console.log("   - Teachers: teacher1@acesaiprofessor.com, teacher2@acesaiprofessor.com, etc.");
+console.log("   - Parents: parent1@acesaiprofessor.com, parent2@acesaiprofessor.com");
+console.log("   - Admin: admin@acesaiprofessor.com");
 console.log("   - All passwords: demo123\n");
 
 await connection.end();

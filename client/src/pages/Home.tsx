@@ -28,7 +28,7 @@ export default function Home() {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
-            ExpertAitutor
+            ACES-AIProfessor
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -165,7 +165,7 @@ export default function Home() {
                 Ready to Transform Your Learning?
               </CardTitle>
               <CardDescription className="text-gray-700 text-lg mb-6">
-                Join thousands of students achieving academic excellence with ExpertAitutor
+                Join thousands of students achieving academic excellence with ACES-AIProfessor
               </CardDescription>
               <Link href={getLoginUrl()}>
                 <Button size="lg" className="bg-indigo-600 text-white hover:bg-indigo-700 text-lg px-8 py-6">

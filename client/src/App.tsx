@@ -29,6 +29,10 @@ import AssessmentAnalysis from "./pages/AssessmentAnalysis";
 import ParentTeacherMeeting from "./pages/ParentTeacherMeeting";
 import ContentApprovalQueue from "./pages/admin/ContentApprovalQueue";
 import ContentSourcesManagement from "./pages/admin/ContentSourcesManagement";
+import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import TeacherDashboard from "./pages/teacher/TeacherDashboard";
+import ParentDashboard from "./pages/parent/ParentDashboard";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import PaymentHistory from "./pages/PaymentHistory";
 import ContentLibrary from "./pages/ContentLibrary";
@@ -78,6 +82,31 @@ function Router() {
       <Route path="/dashboard">
         <ProtectedRoute>
           <Dashboard />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Role-specific dashboards */}
+      <Route path="/superadmin/dashboard">
+        <ProtectedRoute>
+          <SuperAdminDashboard />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/admin/dashboard">
+        <ProtectedRoute>
+          <AdminDashboard />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/dashboard">
+        <ProtectedRoute>
+          <TeacherDashboard />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/parent/dashboard">
+        <ProtectedRoute>
+          <ParentDashboard />
         </ProtectedRoute>
       </Route>
       

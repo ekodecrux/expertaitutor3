@@ -1,0 +1,64 @@
+{
+  "query": "SELECT id, email, name, role FROM users WHERE email IN ('superadmin@acesaiprofessor.com', 'admin@acesaiprofessor.com', 'teacher1@acesaiprofessor.com', 'student1@acesaiprofessor.com', 'parent1@acesaiprofessor.com');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user UqERVjVAX9eY9W2.dc0a0a76636f --database 5L3gkWSwSgtAn7Y93vysCU --execute SELECT id, email, name, role FROM users WHERE email IN ('superadmin@acesaiprofessor.com', 'admin@acesaiprofessor.com', 'teacher1@acesaiprofessor.com', 'student1@acesaiprofessor.com', 'parent1@acesaiprofessor.com');",
+  "rows": [
+    {
+      "id": "120008",
+      "email": "student1@acesaiprofessor.com",
+      "name": "Rahul Sharma",
+      "role": "student"
+    },
+    {
+      "id": "120013",
+      "email": "teacher1@acesaiprofessor.com",
+      "name": "Dr. Rajesh Verma",
+      "role": "teacher"
+    },
+    {
+      "id": "120016",
+      "email": "parent1@acesaiprofessor.com",
+      "name": "Mr. Ramesh Gupta",
+      "role": "parent"
+    },
+    {
+      "id": "120019",
+      "email": "superadmin@acesaiprofessor.com",
+      "name": "Super Admin",
+      "role": "admin"
+    },
+    {
+      "id": "210012",
+      "email": "admin@acesaiprofessor.com",
+      "name": "Admin User",
+      "role": "admin"
+    },
+    {
+      "id": "210013",
+      "email": "superadmin@acesaiprofessor.com",
+      "name": "Super Admin",
+      "role": "admin"
+    },
+    {
+      "id": "210014",
+      "email": "teacher1@acesaiprofessor.com",
+      "name": "Teacher One",
+      "role": "teacher"
+    },
+    {
+      "id": "210015",
+      "email": "student1@acesaiprofessor.com",
+      "name": "Student One",
+      "role": "student"
+    },
+    {
+      "id": "210016",
+      "email": "parent1@acesaiprofessor.com",
+      "name": "Parent One",
+      "role": "parent"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\n120008\tstudent1@acesaiprofessor.com\tRahul Sharma\tstudent\n120013\tteacher1@acesaiprofessor.com\tDr. Rajesh Verma\tteacher\n120016\tparent1@acesaiprofessor.com\tMr. Ramesh Gupta\tparent\n120019\tsuperadmin@acesaiprofessor.com\tSuper Admin\tadmin\n210012\tadmin@acesaiprofessor.com\tAdmin User\tadmin\n210013\tsuperadmin@acesaiprofessor.com\tSuper Admin\tadmin\n210014\tteacher1@acesaiprofessor.com\tTeacher One\tteacher\n210015\tstudent1@acesaiprofessor.com\tStudent One\tstudent\n210016\tparent1@acesaiprofessor.com\tParent One\tparent\n",
+  "stderr": "",
+  "execution_time_ms": 1581
+}

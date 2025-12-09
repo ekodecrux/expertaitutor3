@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
+import { getNavigationForRole } from "@/config/navigation";
 import {
   Award,
   BarChart3,
@@ -65,42 +66,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
     }
   };
 
-  const navSections: NavSection[] = [
-    {
-      title: "MAIN",
-      items: [
-        { label: "Dashboard", icon: Home, path: "/dashboard" },
-      ],
-    },
-    {
-      title: "LEARNING",
-      items: [
-        { label: "My Courses", icon: BookOpen, path: "/courses" },
-        { label: "Video Lessons", icon: Video, path: "/videos" },
-        { label: "Lesson Plan", icon: Calendar, path: "/lesson-plan" },
-        { label: "Assessments", icon: FileText, path: "/assessments" },
-      ],
-    },
-    {
-      title: "AI TOOLS",
-      items: [
-        { label: "AI Tutor", icon: Sparkles, path: "/ai-tutor" },
-        { label: "AI Tutor (Avatar)", icon: Bot, path: "/ai-tutor-avatar" },
-        { label: "Chat Tutor", icon: MessageSquare, path: "/chat-tutor" },
-        { label: "Lesson Narration", icon: BookOpen, path: "/lesson-narration" },
-      ],
-    },
-    {
-      title: "OTHER",
-      items: [
-        { label: "Rewards", icon: Award, path: "/rewards" },
-        { label: "Progress", icon: LineChart, path: "/progress" },
-        { label: "Assessment Analysis", icon: BarChart3, path: "/assessment-analysis" },
-        { label: "Parent-Teacher Meeting", icon: Users, path: "/parent-teacher-meeting" },
-        { label: "Support", icon: HelpCircle, path: "/support" },
-      ],
-    },
-  ];
+  // Get role-specific navigation
+  const navSections = getNavigationForRole(user?.role || "student");
 
   if (loading) {
     return (

@@ -750,3 +750,68 @@
 - [x] Verified login working for all test accounts (student1@acesaiprofessor.com / demo123)
 - [ ] Fix Twilio SMS OTP delivery (verify TWILIO_ACCOUNT_SID format)
 - [ ] Test all 5 user roles (superadmin, admin, teacher, student, parent) login and dashboard access
+
+
+## URGENT: Role-Specific Dashboards & Navigation (December 2025)
+- [ ] Create role-specific navigation configuration for each user type
+- [ ] Build Super Admin Dashboard with:
+  - [ ] Platform-wide analytics (total users, organizations, revenue)
+  - [ ] Organization onboarding and management
+  - [ ] System settings and configuration
+  - [ ] User management across all organizations
+  - [ ] Subscription and billing overview
+- [ ] Build Admin/Institution Admin Dashboard with:
+  - [ ] Institution analytics (students, teachers, courses)
+  - [ ] User management (students, teachers, parents)
+  - [ ] Class and section management
+  - [ ] Content approval queue
+  - [ ] Subscription management
+  - [ ] Reports and analytics
+- [ ] Build Teacher Dashboard with:
+  - [ ] My classes and sections overview
+  - [ ] Student roster and attendance
+  - [ ] Assignment creation and grading
+  - [ ] Student progress monitoring
+  - [ ] Parent communication
+  - [ ] Lesson plan management
+- [ ] Build Parent Dashboard with:
+  - [ ] Child/children overview cards
+  - [ ] Academic progress tracking
+  - [ ] Attendance and behavior reports
+  - [ ] Teacher communication
+  - [ ] Upcoming assignments and tests
+  - [ ] Payment and subscription management
+- [ ] Keep Student Dashboard as-is (current implementation)
+- [ ] Update AppLayout to conditionally render navigation based on user role
+- [ ] Test login for all 5 roles and verify unique dashboards
+
+
+## Student Module UI Improvements (December 2025)
+- [ ] Merge AI Tutor, AI Tutor (Avatar), and Lesson Narration into single "AI Tutor" menu item
+- [ ] Update AI Avatar to show lady teacher instead of current avatar
+- [ ] Create unified AI Tutor interface with tabs for different modes (Chat, Avatar, Narration)
+
+
+## RBAC Hierarchy Clarification (December 2025)
+- [ ] Super Admin inherits all Institution Admin permissions PLUS platform management
+- [ ] Institution Admin has RBAC over Students, Teachers, Parents in their institution
+- [ ] Update superAdminNavigation to include all admin features plus platform-wide controls
+- [ ] Ensure backend procedures enforce role hierarchy (superadmin can access admin routes)
+
+
+## Phase 45: Role-Based Dashboards Implementation (COMPLETED - December 9, 2025)
+- [x] Create Super Admin dashboard with platform-wide analytics
+- [x] Create Admin dashboard with institution management
+- [x] Create Teacher dashboard with class management
+- [x] Create Parent dashboard with child monitoring
+- [x] Verify Student dashboard is unique and role-specific
+- [x] Create role-based navigation configuration (navigation.ts)
+- [x] Update AppLayout to use role-specific navigation
+- [x] Update Login redirect to use role-specific dashboard paths
+- [x] Fix database role values (super_admin instead of superadmin)
+- [x] Test all 5 roles and verify unique dashboards
+- [x] Merge AI Tutor menu items into single "AI Tutor" entry
+- [x] Super Admin inherits all Institution Admin permissions PLUS platform management
+- [x] Update superAdminNavigation to include all admin features plus platform-wide controls
+- [ ] Update AI Avatar to show lady teacher instead of current avatar
+- [ ] Ensure backend procedures enforce role hierarchy (superadmin can access admin routes)

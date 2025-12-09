@@ -21,13 +21,22 @@ export default function Login() {
   const [otpSent, setOtpSent] = useState(false);
 
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       toast.success("Login successful!");
       // Invalidate and refetch the auth.me query to update authentication state
       await utils.auth.me.invalidate();
+      // Redirect to role-specific dashboard
+      const role = data.user.role;
+      const dashboardPath = 
+        role === "super_admin" ? "/superadmin/dashboard" :
+        role === "admin" || role === "institution_admin" ? "/admin/dashboard" :
+        role === "teacher" ? "/teacher/dashboard" :
+        role === "parent" ? "/parent/dashboard" :
+        "/dashboard"; // student default
+      
       // Small delay to ensure cookie is set
       setTimeout(() => {
-        setLocation("/dashboard");
+        setLocation(dashboardPath);
       }, 100);
     },
     onError: (error) => {
@@ -46,13 +55,22 @@ export default function Login() {
   });
 
   const verifyOTPMutation = trpc.auth.verifyOTP.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       toast.success("Login successful!");
       // Invalidate and refetch the auth.me query to update authentication state
       await utils.auth.me.invalidate();
+      // Redirect to role-specific dashboard
+      const role = data.user.role;
+      const dashboardPath = 
+        role === "super_admin" ? "/superadmin/dashboard" :
+        role === "admin" || role === "institution_admin" ? "/admin/dashboard" :
+        role === "teacher" ? "/teacher/dashboard" :
+        role === "parent" ? "/parent/dashboard" :
+        "/dashboard"; // student default
+      
       // Small delay to ensure cookie is set
       setTimeout(() => {
-        setLocation("/dashboard");
+        setLocation(dashboardPath);
       }, 100);
     },
     onError: (error) => {

@@ -7,6 +7,8 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
@@ -25,6 +27,8 @@ import AITutorWithAvatar from "./pages/AITutorWithAvatar";
 import LessonNarration from "./pages/LessonNarration";
 import AssessmentAnalysis from "./pages/AssessmentAnalysis";
 import ParentTeacherMeeting from "./pages/ParentTeacherMeeting";
+import ContentApprovalQueue from "./pages/admin/ContentApprovalQueue";
+import ContentSourcesManagement from "./pages/admin/ContentSourcesManagement";
 import { useAuth } from "./_core/hooks/useAuth";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
@@ -62,6 +66,8 @@ function Router() {
       <Route path="/home" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password/:token" component={ResetPassword} />
       
       {/* Protected routes with AppLayout */}
       <Route path="/dashboard">
@@ -166,7 +172,19 @@ function Router() {
         </ProtectedRoute>
       </Route>
       
-      <Route path="/404" component={NotFound} />
+      {/* Admin Content Management Routes */}
+      <Route path="/admin/content-approval">
+        <ProtectedRoute>
+          <ContentApprovalQueue />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/admin/content-sources">
+        <ProtectedRoute>
+          <ContentSourcesManagement />
+        </ProtectedRoute>
+      </Route>
+      
       <Route component={NotFound} />
     </Switch>
   );

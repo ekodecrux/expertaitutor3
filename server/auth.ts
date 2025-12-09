@@ -209,3 +209,95 @@ export async function verifyOTP(email: string, otp: string) {
 
   return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
 }
+
+
+// Generate password reset token
+export async function generateResetToken(email: string): Promise<{ success: boolean; error?: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+
+  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  
+  if (!user) {
+    // Don't reveal if email exists for security
+    return { success: true };
+  }
+
+  // Generate secure random token
+  const resetToken = uuidv4();
+  const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour from now
+
+  await db.update(users)
+    .set({
+      resetToken,
+      resetTokenExpiry,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id));
+
+  return { success: true };
+}
+
+// Verify reset token and update password
+export async function resetPasswordWithToken(
+  token: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  const db = await getDb();
+  if (!db) return { success: false, error: "Database not available" };
+
+  // Validate password
+  const validation = validatePassword(newPassword);
+  if (!validation.valid) {
+    return { success: false, error: validation.error };
+  }
+
+  // Find user with valid token
+  const [user] = await db.select()
+    .from(users)
+    .where(eq(users.resetToken, token))
+    .limit(1);
+
+  if (!user) {
+    return { success: false, error: "Invalid or expired reset token" };
+  }
+
+  // Check if token is expired
+  if (!user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
+    return { success: false, error: "Reset token has expired" };
+  }
+
+  // Hash new password
+  const passwordHash = await hashPassword(newPassword);
+
+  // Update password and clear reset token
+  await db.update(users)
+    .set({
+      passwordHash,
+      resetToken: null,
+      resetTokenExpiry: null,
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id));
+
+  return { success: true };
+}
+
+// Get reset token info (for validation on frontend)
+export async function getResetTokenInfo(token: string): Promise<{ valid: boolean; email?: string }> {
+  const db = await getDb();
+  if (!db) return { valid: false };
+
+  const [user] = await db.select()
+    .from(users)
+    .where(eq(users.resetToken, token))
+    .limit(1);
+
+  if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
+    return { valid: false };
+  }
+
+  return { valid: true, email: user.email || undefined };
+}

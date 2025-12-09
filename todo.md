@@ -544,3 +544,47 @@
 - [x] Implement content library browsing endpoints
 - [x] Implement content statistics dashboard endpoint
 - [x] Add content router to main router export
+
+
+## Phase 39: Forgot Password Implementation (COMPLETED)
+- [x] Add forgot password backend endpoint (generate reset token)
+- [x] Add reset password backend endpoint (validate token and update password)
+- [x] Add token validation endpoint
+- [x] Create ForgotPassword.tsx page
+- [x] Create ResetPassword.tsx page
+- [x] Add "Forgot Password?" link to Login page
+- [x] Add routes for forgot/reset password pages
+- [ ] Add email sending for password reset links (TODO: requires email service)
+
+## Phase 40: Admin Dashboard UI for Content Approval (COMPLETED)
+- [x] Create ContentApprovalQueue.tsx page
+- [x] Create ContentSourcesManagement.tsx page
+- [x] Add approval queue table with quality scores
+- [x] Add approve/reject/needs-review actions
+- [x] Add content preview modal (approve/reject dialogs)
+- [x] Add scraper execution controls
+- [x] Add content statistics dashboard
+- [x] Add routes for admin content pages
+- [ ] Add scraping logs viewer (TODO: separate page if needed)
+
+## Phase 41: Stripe Payment Gateway Integration (PARTIALLY COMPLETED)
+- [x] Run webdev_add_feature with feature="stripe"
+- [x] Configure Stripe subscription plans (stripe-products.ts)
+- [x] Create Stripe router with checkout endpoints
+- [x] Add subscription management backend (cancel/resume)
+- [x] Add payment history backend
+- [x] Add billing portal session creation
+- [x] Update schema with Stripe customer/subscription/payment fields
+- [ ] Implement webhook handler at /api/stripe/webhook
+- [ ] Create subscription management UI (frontend)
+- [ ] Create billing history page (frontend)
+- [ ] Add subscription status indicators in dashboard
+
+## Phase 42: Content Library Frontend (TODO)
+- [ ] Create ContentLibrary.tsx page
+- [ ] Add content filtering by curriculum/subject/topic
+- [ ] Add difficulty level filtering
+- [ ] Add content type tabs (notes/videos/questions/past papers)
+- [ ] Add content preview and download
+- [ ] Add search functionality
+- [ ] Add bookmarking/favorites feature

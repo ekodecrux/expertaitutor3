@@ -28,6 +28,8 @@ export const users = mysqlTable("users", {
   gdprConsent: boolean("gdprConsent").default(false),
   gdprConsentDate: timestamp("gdprConsentDate"),
   dataResidency: varchar("dataResidency", { length: 50 }),
+  // Stripe integration
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -480,16 +482,24 @@ export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
 export const subscriptions = mysqlTable("subscriptions", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
-  planId: int("planId").notNull(),
-  status: mysqlEnum("status", ["active", "cancelled", "expired", "trial"]).default("active"),
-  startDate: timestamp("startDate").defaultNow().notNull(),
-  endDate: timestamp("endDate").notNull(),
+  planId: int("planId"),
+  // Stripe integration fields
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }).unique(),
+  stripePriceId: varchar("stripePriceId", { length: 255 }),
+  planType: varchar("planType", { length: 100 }), // INSTITUTION_BASIC_MONTHLY, PARENT_MONTHLY, etc.
+  status: mysqlEnum("status", ["active", "cancelled", "expired", "trial", "canceled", "past_due", "trialing", "incomplete"]).default("active"),
+  startDate: timestamp("startDate").defaultNow(),
+  endDate: timestamp("endDate"),
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false),
+  trialEnd: timestamp("trialEnd"),
   autoRenew: boolean("autoRenew").default(true),
   paymentMethod: varchar("paymentMethod", { length: 100 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   userIdx: index("user_idx").on(table.userId),
+  stripeSubscriptionIdx: index("stripe_subscription_idx").on(table.stripeSubscriptionId),
 }));
 
 export type Subscription = typeof subscriptions.$inferSelect;
@@ -501,15 +511,22 @@ export const payments = mysqlTable("payments", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
   subscriptionId: int("subscriptionId"),
+  // Stripe integration fields
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }).unique(),
+  stripeInvoiceId: varchar("stripeInvoiceId", { length: 255 }),
+  productType: varchar("productType", { length: 100 }), // COURSE_JEE_MAIN, etc.
   amount: int("amount").notNull(), // in cents
   currency: varchar("currency", { length: 10 }).default("USD"),
-  status: mysqlEnum("status", ["pending", "completed", "failed", "refunded"]).default("pending"),
+  status: mysqlEnum("status", ["pending", "completed", "failed", "refunded", "succeeded"]).default("pending"),
   paymentMethod: varchar("paymentMethod", { length: 100 }),
   transactionId: varchar("transactionId", { length: 255 }),
   invoiceUrl: text("invoiceUrl"),
+  metadata: json("metadata").$type<Record<string, any>>(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
 }, (table) => ({
   userIdx: index("user_idx").on(table.userId),
+  paymentIntentIdx: index("payment_intent_idx").on(table.stripePaymentIntentId),
 }));
 
 export type Payment = typeof payments.$inferSelect;
@@ -749,3 +766,4 @@ export const scrapingLogs = mysqlTable("scraping_logs", {
 
 export type ScrapingLog = typeof scrapingLogs.$inferSelect;
 export type InsertScrapingLog = typeof scrapingLogs.$inferInsert;
+

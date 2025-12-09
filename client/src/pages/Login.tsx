@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -108,6 +108,13 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Link href="/forgot-password">
+                    <a className="text-sm text-indigo-600 hover:text-indigo-700 hover:underline">
+                      Forgot password?
+                    </a>
+                  </Link>
                 </div>
                 <Button
                   type="submit"

@@ -11,6 +11,7 @@ import * as db from "./db";
 import * as auth from "./auth";
 import { adminRouter } from "./routers-admin";
 import { contentRouter } from "./routers-content";
+import { stripeRouter } from "./routers-stripe";
 
 // ============= RBAC MIDDLEWARE =============
 
@@ -92,6 +93,27 @@ export const appRouter = router({
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, result.token, cookieOptions);
         return result;
+      }),
+    forgotPassword: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        const result = await auth.generateResetToken(input.email);
+        // TODO: Send email with reset link
+        // For now, return success (in production, send email)
+        return { success: result.success };
+      }),
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        newPassword: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        return await auth.resetPasswordWithToken(input.token, input.newPassword);
+      }),
+    validateResetToken: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .query(async ({ input }) => {
+        return await auth.getResetTokenInfo(input.token);
       }),
   }),
 
@@ -637,6 +659,10 @@ Provide a week-by-week breakdown with topics to cover.`,
   // ============= CONTENT LIBRARY =============
   
   content: contentRouter,
+
+  // ============= STRIPE PAYMENTS =============
+  
+  stripe: stripeRouter,
 
   // ============= FILE UPLOAD =============
   

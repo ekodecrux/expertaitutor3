@@ -1,0 +1,45 @@
+{
+  "query": "SHOW CREATE TABLE users",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user UqERVjVAX9eY9W2.dc0a0a76636f --database 5L3gkWSwSgtAn7Y93vysCU --execute SHOW CREATE TABLE users",
+  "rows": [
+    {
+      "Table": "users",
+      "Create Table": "CREATE TABLE `users` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `openId` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `name` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `email` varchar(320) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `mobile` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `loginMethod` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `role` enum('student','parent','teacher','admin','institution_admin','branch_admin','super_admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'student',",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `institutionId` int(11) DEFAULT NULL,",
+    "  `passwordHash` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `emailVerified` tinyint(1) DEFAULT '0',",
+    "  `otpCode` varchar(6) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `otpExpiry` timestamp NULL DEFAULT NULL,",
+    "  `resetToken` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `resetTokenExpiry` timestamp NULL DEFAULT NULL,",
+    "  `failedLoginAttempts` int(11) DEFAULT '0',",
+    "  `lockedUntil` timestamp NULL DEFAULT NULL,",
+    "  `googleId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `facebookId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `gdprConsent` tinyint(1) DEFAULT '0',",
+    "  `gdprConsentDate` timestamp NULL DEFAULT NULL,",
+    "  `dataResidency` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `organizationId` int(11) DEFAULT NULL,",
+    "  `branchId` int(11) DEFAULT NULL,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `users_openId_unique` (`openId`),",
+    "  KEY `institution_idx` (`institutionId`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=90001"
+  ],
+  "stdout": "Table\tCreate Table\nusers\tCREATE TABLE `users` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `openId` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `name` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `email` varchar(320) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `mobile` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `loginMethod` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `role` enum('student','parent','teacher','admin','institution_admin','branch_admin','super_admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'student',\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `institutionId` int(11) DEFAULT NULL,\n  `passwordHash` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `emailVerified` tinyint(1) DEFAULT '0',\n  `otpCode` varchar(6) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `otpExpiry` timestamp NULL DEFAULT NULL,\n  `resetToken` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `resetTokenExpiry` timestamp NULL DEFAULT NULL,\n  `failedLoginAttempts` int(11) DEFAULT '0',\n  `lockedUntil` timestamp NULL DEFAULT NULL,\n  `googleId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `facebookId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `gdprConsent` tinyint(1) DEFAULT '0',\n  `gdprConsentDate` timestamp NULL DEFAULT NULL,\n  `dataResidency` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `organizationId` int(11) DEFAULT NULL,\n  `branchId` int(11) DEFAULT NULL,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `users_openId_unique` (`openId`),\n  KEY `institution_idx` (`institutionId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=90001\n",
+  "stderr": "",
+  "execution_time_ms": 1599
+}

@@ -66,8 +66,10 @@ export async function registerUser(data: {
   password: string;
   role?: string;
 }) {
-  const db = await getDb();
-  if (!db) throw new Error("Database unavailable");
+  try {
+    console.log('[Auth] Starting registration for:', data.email);
+    const db = await getDb();
+    if (!db) throw new Error("Database unavailable");
 
   // Validate password
   const passwordCheck = validatePassword(data.password);
@@ -85,6 +87,7 @@ export async function registerUser(data: {
   const passwordHash = await hashPassword(data.password);
 
   // Create user
+  console.log('[Auth] Creating user with data:', { name: data.name, email: data.email, role: data.role });
   const result = await db.insert(users).values({
     openId: uuidv4(),
     name: data.name,
@@ -97,6 +100,7 @@ export async function registerUser(data: {
     updatedAt: new Date(),
     lastSignedIn: new Date(),
   });
+  console.log('[Auth] User created, result:', result);
 
   // Get the created user
   const newUser = await db.select().from(users).where(eq(users.email, data.email)).limit(1);
@@ -107,6 +111,7 @@ export async function registerUser(data: {
   const user = newUser[0];
   const token = await generateToken(user.id, user.email || data.email, user.role);
 
+  console.log('[Auth] Registration successful for user:', user.id);
   return {
     success: true,
     userId: user.id,
@@ -118,6 +123,10 @@ export async function registerUser(data: {
       role: user.role,
     },
   };
+  } catch (error) {
+    console.error('[Auth] Registration error:', error);
+    throw error;
+  }
 }
 
 // Login user

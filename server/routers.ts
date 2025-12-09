@@ -62,8 +62,22 @@ export const appRouter = router({
         password: z.string(),
         role: z.enum(["student", "teacher", "parent"]).optional(),
       }))
-      .mutation(async ({ input }) => {
-        return await auth.registerUser(input);
+      .mutation(async ({ input, ctx }) => {
+        try {
+          console.log('[Router] Registration request:', { email: input.email, role: input.role });
+          const result = await auth.registerUser(input);
+          console.log('[Router] Registration successful');
+          // Set session cookie
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie(COOKIE_NAME, result.token, cookieOptions);
+          return result;
+        } catch (error: any) {
+          console.error('[Router] Registration failed:', error.message);
+          throw new TRPCError({ 
+            code: 'INTERNAL_SERVER_ERROR', 
+            message: error.message || 'Registration failed' 
+          });
+        }
       }),
     login: publicProcedure
       .input(z.object({

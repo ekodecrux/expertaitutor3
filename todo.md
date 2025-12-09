@@ -689,3 +689,35 @@
 - [ ] Debug remaining registration 500 error (needs investigation)
 - [ ] Test registration flow end-to-end
 - [ ] Test OTP login flow end-to-end
+
+
+## Phase 51: Debug Registration 500 Error (COMPLETED)
+- [x] Check database constraints on users table
+- [x] Add detailed error logging to registerUser function
+- [x] Fix missing stripeCustomerId column in database
+- [x] Add error handling to register endpoint
+- [x] Test registration with valid data
+- [x] Verify JWT token generation
+- [x] Test registration end-to-end - WORKING
+
+## Phase 52: Saudi Arabia Competitive Exams (TODO)
+- [ ] Add Qiyas (GAT - General Aptitude Test) scraper
+- [ ] Add Qiyas (SAAT - Scholastic Achievement Admission Test) scraper
+- [ ] Add SMLE (Saudi Medical Licensing Exam) scraper
+- [ ] Add SLE (Saudi Licensing Exam) scraper
+- [ ] Add Saudi Nursing License Exam scraper
+- [ ] Add Saudi Engineering License Exam scraper
+- [ ] Update content categorization for KSA exams
+- [ ] Test KSA content scrapers
+
+## Phase 53: Email/SMS Service Integration (TODO)
+- [ ] Install SendGrid SDK
+- [ ] Configure SendGrid API key
+- [ ] Create email templates for password reset
+- [ ] Create email templates for OTP
+- [ ] Install Twilio SDK
+- [ ] Configure Twilio API credentials
+- [ ] Implement SMS OTP sending
+- [ ] Test email sending
+- [ ] Test SMS sending
+- [ ] Update auth functions to use email/SMS services

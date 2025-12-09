@@ -434,3 +434,19 @@
 - [ ] Build previous year papers scraper
 - [ ] Build YouTube educational video aggregator
 - [ ] Create content library admin panel
+
+
+## CURRENT SESSION: Admin APIs, Content Aggregation, Payment Gateway
+- [ ] Build admin backend APIs (createClass, getClasses, createSection, enrollStudent, assignTeacher)
+- [ ] Add CSV bulk import endpoint for users
+- [ ] Create web scraper for NCERT content
+- [ ] Build scraper for CBSE past papers
+- [ ] Implement YouTube educational video aggregator
+- [ ] Create content approval workflow
+- [ ] Install and configure Stripe SDK
+- [ ] Build subscription plan management
+- [ ] Implement payment processing endpoints
+- [ ] Create invoice generation system
+- [ ] Build admin panel UI for class management
+- [ ] Add content library admin interface
+- [ ] Create subscription management dashboard

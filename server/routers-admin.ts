@@ -257,4 +257,15 @@ export const adminRouter = router({
       
       return await adminDb.bulkCreateUsers(usersData);
     }),
+
+  // ============= PARENT MANAGEMENT =============
+  
+  getParents: protectedProcedure
+    .query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin" && ctx.user.role !== "super_admin") {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      const db = await import("./db");
+      return await db.getInstitutionParents();
+    }),
 });

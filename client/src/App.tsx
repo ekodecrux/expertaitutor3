@@ -33,6 +33,36 @@ import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import ParentDashboard from "./pages/parent/ParentDashboard";
+import TeacherClasses from "./pages/teacher/TeacherClasses";
+import TeacherStudents from "./pages/teacher/TeacherStudents";
+import TeacherAttendance from "./pages/teacher/TeacherAttendance";
+import TeacherLessonPlans from "./pages/teacher/TeacherLessonPlans";
+import TeacherAssignments from "./pages/teacher/TeacherAssignments";
+import TeacherAssessments from "./pages/teacher/TeacherAssessments";
+import TeacherGrading from "./pages/teacher/TeacherGrading";
+import TeacherMessages from "./pages/teacher/TeacherMessages";
+import TeacherParentMeetings from "./pages/teacher/TeacherParentMeetings";
+import TeacherReports from "./pages/teacher/TeacherReports";
+import ParentChildren from "./pages/parent/ParentChildren";
+import ParentProgress from "./pages/parent/ParentProgress";
+import ParentAttendance from "./pages/parent/ParentAttendance";
+import ParentAssessments from "./pages/parent/ParentAssessments";
+import ParentMessages from "./pages/parent/ParentMessages";
+import ParentMeetings from "./pages/parent/ParentMeetings";
+import AdminStudents from "./pages/admin/AdminStudents";
+import AdminTeachers from "./pages/admin/AdminTeachers";
+import AdminParents from "./pages/admin/AdminParents";
+import AdminClasses from "./pages/admin/AdminClasses";
+import AdminReports from "./pages/admin/AdminReports";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminSettings from "./pages/admin/AdminSettings";
+import SuperAdminOrganizations from "./pages/superadmin/SuperAdminOrganizations";
+import SuperAdminUsers from "./pages/superadmin/SuperAdminUsers";
+import SuperAdminSubscriptions from "./pages/superadmin/SuperAdminSubscriptions";
+import SuperAdminAnalytics from "./pages/superadmin/SuperAdminAnalytics";
+import SuperAdminRevenue from "./pages/superadmin/SuperAdminRevenue";
+import SuperAdminSettings from "./pages/superadmin/SuperAdminSettings";
+import SuperAdminSupport from "./pages/superadmin/SuperAdminSupport";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import PaymentHistory from "./pages/PaymentHistory";
 import ContentLibrary from "./pages/ContentLibrary";
@@ -203,6 +233,190 @@ function Router() {
       <Route path="/parent-teacher-meeting">
         <ProtectedRoute>
           <ParentTeacherMeeting />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Teacher Routes */}
+      <Route path="/teacher/classes">
+        <ProtectedRoute>
+          <TeacherClasses />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/students">
+        <ProtectedRoute>
+          <TeacherStudents />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/attendance">
+        <ProtectedRoute>
+          <TeacherAttendance />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/lesson-plans">
+        <ProtectedRoute>
+          <TeacherLessonPlans />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/assignments">
+        <ProtectedRoute>
+          <TeacherAssignments />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/assessments">
+        <ProtectedRoute>
+          <TeacherAssessments />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/grading">
+        <ProtectedRoute>
+          <TeacherGrading />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/messages">
+        <ProtectedRoute>
+          <TeacherMessages />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/parent-meetings">
+        <ProtectedRoute>
+          <TeacherParentMeetings />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/teacher/reports">
+        <ProtectedRoute>
+          <TeacherReports />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Parent Routes */}
+      <Route path="/parent/children">
+        <ProtectedRoute>
+          <ParentChildren />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/parent/progress">
+        <ProtectedRoute>
+          <ParentProgress />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/parent/attendance">
+        <ProtectedRoute>
+          <ParentAttendance />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/parent/assessments">
+        <ProtectedRoute>
+          <ParentAssessments />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/parent/messages">
+        <ProtectedRoute>
+          <ParentMessages />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/parent/meetings">
+        <ProtectedRoute>
+          <ParentMeetings />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Admin Routes */}
+      <Route path="/admin/students">
+        <ProtectedRoute>
+          <AdminStudents />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/admin/teachers">
+        <ProtectedRoute>
+          <AdminTeachers />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/admin/parents">
+        <ProtectedRoute>
+          <AdminParents />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/admin/classes">
+        <ProtectedRoute>
+          <AdminClasses />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/admin/reports">
+        <ProtectedRoute>
+          <AdminReports />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/admin/analytics">
+        <ProtectedRoute>
+          <AdminAnalytics />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/admin/settings">
+        <ProtectedRoute>
+          <AdminSettings />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Super Admin Routes */}
+      <Route path="/superadmin/organizations">
+        <ProtectedRoute>
+          <SuperAdminOrganizations />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/superadmin/users">
+        <ProtectedRoute>
+          <SuperAdminUsers />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/superadmin/subscriptions">
+        <ProtectedRoute>
+          <SuperAdminSubscriptions />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/superadmin/analytics">
+        <ProtectedRoute>
+          <SuperAdminAnalytics />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/superadmin/revenue">
+        <ProtectedRoute>
+          <SuperAdminRevenue />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/superadmin/settings">
+        <ProtectedRoute>
+          <SuperAdminSettings />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/superadmin/support">
+        <ProtectedRoute>
+          <SuperAdminSupport />
         </ProtectedRoute>
       </Route>
       

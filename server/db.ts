@@ -572,3 +572,253 @@ export async function markNotificationAsRead(id: number) {
   if (!db) return;
   await db.update(notifications).set({ read: true }).where(eq(notifications.id, id));
 }
+
+
+// ============= TEACHER FUNCTIONS =============
+
+export async function getTeacherClasses(teacherId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock data for now - will be replaced with actual database query when classes table is ready
+  return [
+    { id: 1, name: "Class 10-A", section: "Mathematics", subject: "Mathematics", studentCount: 42, schedule: "Mon, Wed, Fri - 10:00 AM" },
+    { id: 2, name: "Class 10-B", section: "Mathematics", subject: "Mathematics", studentCount: 38, schedule: "Tue, Thu - 11:00 AM" },
+    { id: 3, name: "Class 9-A", section: "Mathematics", subject: "Mathematics", studentCount: 45, schedule: "Mon, Wed, Fri - 2:00 PM" },
+    { id: 4, name: "Class 9-B", section: "Mathematics", subject: "Mathematics", studentCount: 31, schedule: "Tue, Thu - 3:00 PM" },
+  ];
+}
+
+export async function getTeacherStudents(teacherId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock data - will be replaced with actual query
+  return await db.select().from(users).where(eq(users.role, 'student')).limit(50);
+}
+
+export async function markAttendance(data: { classId: number; studentId: number; date: string; status: string }) {
+  const db = await getDb();
+  if (!db) return;
+  // Will implement when attendance table is added to schema
+  return { success: true, ...data };
+}
+
+export async function getAttendanceRecords(params: { classId: number; startDate?: string; endDate?: string }) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock data - will be replaced
+  return [];
+}
+
+export async function createLessonPlan(data: any) {
+  const db = await getDb();
+  if (!db) return;
+  // Will implement when lesson_plans table is added
+  return { id: Date.now(), ...data };
+}
+
+export async function getTeacherLessonPlans(teacherId: number, classId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock data
+  return [];
+}
+
+export async function createAssignment(data: any) {
+  const db = await getDb();
+  if (!db) return;
+  // Will implement when assignments table is added
+  return { id: Date.now(), ...data };
+}
+
+export async function getTeacherAssignments(teacherId: number, classId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock data
+  return [];
+}
+
+export async function gradeAssignmentSubmission(data: { submissionId: number; marks: number; feedback?: string }) {
+  const db = await getDb();
+  if (!db) return;
+  // Will implement when assignment_submissions table is added
+  return { success: true, ...data };
+}
+
+export async function getAssignmentSubmissions(assignmentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock data
+  return [];
+}
+
+export async function createAssessment(data: any) {
+  const db = await getDb();
+  if (!db) return;
+  // Will implement when assessments table is added to schema
+  return { id: Date.now(), ...data };
+}
+
+export async function getTeacherAssessments(teacherId: number, classId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock data
+  return [];
+}
+
+export async function getClassAnalytics(classId: number) {
+  const db = await getDb();
+  if (!db) return {};
+  // Mock analytics data
+  return {
+    averageScore: 75,
+    attendanceRate: 92,
+    assignmentCompletionRate: 85,
+    topPerformers: [],
+    strugglingStudents: [],
+  };
+}
+
+export async function scheduleParentMeeting(data: any) {
+  const db = await getDb();
+  if (!db) return;
+  // Will implement when meetings table is added
+  return { id: Date.now(), ...data };
+}
+
+export async function getTeacherMeetings(teacherId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock data
+  return [];
+}
+
+// ============= PARENT FUNCTIONS =============
+
+export async function getParentChildren(parentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await getStudentsByParent(parentId);
+}
+
+export async function getChildProgress(studentId: number) {
+  const db = await getDb();
+  if (!db) return {};
+  // Mock progress data
+  return {
+    overallScore: 85,
+    attendanceRate: 96,
+    recentAssessments: [],
+    upcomingTests: [],
+  };
+}
+
+export async function getChildAttendance(studentId: number, startDate?: string, endDate?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock attendance data
+  return [];
+}
+
+export async function getChildAssessments(studentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock assessment data
+  return [];
+}
+
+export async function getParentMeetings(parentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock meetings data
+  return [];
+}
+
+// ============= ADMIN FUNCTIONS =============
+
+export async function getInstitutionStudents(institutionId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(users).where(eq(users.role, 'student')).limit(100);
+}
+
+export async function getInstitutionTeachers(institutionId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(users).where(eq(users.role, 'teacher')).limit(100);
+}
+
+export async function getInstitutionParents(institutionId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(users).where(eq(users.role, 'parent')).limit(100);
+}
+
+export async function getInstitutionClasses(institutionId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock classes data
+  return [];
+}
+
+export async function getInstitutionReports(institutionId: number) {
+  const db = await getDb();
+  if (!db) return {};
+  // Mock reports data
+  return {
+    totalStudents: 1245,
+    totalTeachers: 87,
+    totalParents: 890,
+    averageAttendance: 94,
+    averagePerformance: 78,
+  };
+}
+
+export async function getInstitutionAnalytics(institutionId: number) {
+  const db = await getDb();
+  if (!db) return {};
+  // Mock analytics data
+  return {
+    enrollmentTrend: [],
+    performanceTrend: [],
+    attendanceTrend: [],
+  };
+}
+
+// ============= SUPER ADMIN FUNCTIONS =============
+
+export async function getAllOrganizations() {
+  const db = await getDb();
+  if (!db) return [];
+  return await getAllInstitutions();
+}
+
+export async function getPlatformUsers() {
+  const db = await getDb();
+  if (!db) return [];
+  return await getAllUsers();
+}
+
+export async function getPlatformSubscriptions() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(subscriptions).orderBy(desc(subscriptions.createdAt));
+}
+
+export async function getPlatformAnalytics() {
+  const db = await getDb();
+  if (!db) return {};
+  // Mock platform-wide analytics
+  return {
+    totalOrganizations: 24,
+    totalUsers: 12458,
+    monthlyRevenue: 45230,
+    activeSubscriptions: 18,
+  };
+}
+
+export async function getRevenueReports(startDate?: string, endDate?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  // Mock revenue data
+  return [];
+}

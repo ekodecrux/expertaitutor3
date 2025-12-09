@@ -12,6 +12,9 @@ import * as auth from "./auth";
 import { adminRouter } from "./routers-admin";
 import { contentRouter } from "./routers-content";
 import { stripeRouter } from "./routers-stripe";
+import { teacherRouter } from "./routers-teacher";
+import { parentRouter } from "./routers-parent";
+import { superAdminRouter } from "./routers-superadmin";
 
 // ============= RBAC MIDDLEWARE =============
 
@@ -627,24 +630,7 @@ Provide a week-by-week breakdown with topics to cover.`,
     }),
   }),
 
-  // ============= PARENT FEATURES =============
-  
-  parent: router({
-    getLinkedStudents: parentProcedure.query(async ({ ctx }) => {
-      return await db.getStudentsByParent(ctx.user.id);
-    }),
-    
-    getStudentProgress: parentProcedure
-      .input(z.object({ studentId: z.number() }))
-      .query(async ({ input }) => {
-        const profile = await db.getStudentProfile(input.studentId);
-        const knowledge = await db.getAllKnowledgeProfiles(input.studentId);
-        const gameStats = await db.getStudentGameStats(input.studentId);
-        const recentActivity = await db.getActivityLogs(input.studentId);
-        
-        return { profile, knowledge, gameStats, recentActivity };
-      }),
-  }),
+  // ============= PARENT FEATURES (moved to routers-parent.ts) =============
 
 
 
@@ -676,6 +662,18 @@ Provide a week-by-week breakdown with topics to cover.`,
   // ============= STRIPE PAYMENTS =============
   
   stripe: stripeRouter,
+
+  // ============= TEACHER MANAGEMENT =============
+  
+  teacher: teacherRouter,
+
+  // ============= PARENT MANAGEMENT =============
+  
+  parent: parentRouter,
+
+  // ============= SUPER ADMIN MANAGEMENT =============
+  
+  superadmin: superAdminRouter,
 
   // ============= FILE UPLOAD =============
   

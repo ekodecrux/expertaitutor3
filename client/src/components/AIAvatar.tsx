@@ -116,8 +116,12 @@ export default function AIAvatar({
             </>
           )}
           
-          {/* Avatar Emoji */}
-          <span className="relative z-10 drop-shadow-lg">{getAvatarEmoji()}</span>
+          {/* Avatar Image */}
+          <img 
+            src="/lady-teacher-avatar.png" 
+            alt="AI Tutor" 
+            className="relative z-10 w-full h-full object-cover rounded-full"
+          />
         </div>
 
         {/* Speaking indicator */}

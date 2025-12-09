@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS message_read_status (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  messageId INT NOT NULL,\n  userId INT NOT NULL,\n  readAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX read_message_idx (messageId),\n  INDEX read_user_idx (userId),\n  UNIQUE INDEX read_msg_user_idx (messageId, userId)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user UqERVjVAX9eY9W2.dc0a0a76636f --database 5L3gkWSwSgtAn7Y93vysCU --execute CREATE TABLE IF NOT EXISTS message_read_status (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  messageId INT NOT NULL,\n  userId INT NOT NULL,\n  readAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX read_message_idx (messageId),\n  INDEX read_user_idx (userId),\n  UNIQUE INDEX read_msg_user_idx (messageId, userId)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1825
+}

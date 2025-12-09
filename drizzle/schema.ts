@@ -31,6 +31,8 @@ export const users = mysqlTable("users", {
   dataResidency: varchar("dataResidency", { length: 50 }),
   // Stripe integration
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  // Profile
+  profilePhotoUrl: text("profilePhotoUrl"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -783,3 +785,77 @@ export const contentFavorites = mysqlTable("content_favorites", {
 
 export type ContentFavorite = typeof contentFavorites.$inferSelect;
 export type InsertContentFavorite = typeof contentFavorites.$inferInsert;
+
+
+/**
+ * Messaging System
+ */
+
+// Conversations (chat threads)
+export const conversations = mysqlTable("conversations", {
+  id: int("id").autoincrement().primaryKey(),
+  type: mysqlEnum("type", ["direct", "group"]).notNull(),
+  title: varchar("title", { length: 255 }), // For group chats
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  lastMessageAt: timestamp("lastMessageAt"),
+}, (table) => ({
+  createdByIdx: index("conv_created_by_idx").on(table.createdBy),
+  lastMessageIdx: index("conv_last_message_idx").on(table.lastMessageAt),
+}));
+
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = typeof conversations.$inferInsert;
+
+// Conversation participants
+export const conversationParticipants = mysqlTable("conversation_participants", {
+  id: int("id").autoincrement().primaryKey(),
+  conversationId: int("conversationId").notNull(),
+  userId: int("userId").notNull(),
+  joinedAt: timestamp("joinedAt").defaultNow().notNull(),
+  leftAt: timestamp("leftAt"),
+  lastReadAt: timestamp("lastReadAt"),
+}, (table) => ({
+  conversationIdx: index("part_conversation_idx").on(table.conversationId),
+  userIdx: index("part_user_idx").on(table.userId),
+  conversationUserIdx: uniqueIndex("part_conv_user_idx").on(table.conversationId, table.userId),
+}));
+
+export type ConversationParticipant = typeof conversationParticipants.$inferSelect;
+export type InsertConversationParticipant = typeof conversationParticipants.$inferInsert;
+
+// Messages
+export const messages = mysqlTable("messages", {
+  id: int("id").autoincrement().primaryKey(),
+  conversationId: int("conversationId").notNull(),
+  senderId: int("senderId").notNull(),
+  content: text("content").notNull(),
+  attachmentUrl: text("attachmentUrl"),
+  attachmentType: varchar("attachmentType", { length: 50 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  deletedAt: timestamp("deletedAt"),
+}, (table) => ({
+  conversationIdx: index("msg_conversation_idx").on(table.conversationId),
+  senderIdx: index("msg_sender_idx").on(table.senderId),
+  createdIdx: index("msg_created_idx").on(table.createdAt),
+}));
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;
+
+// Message read status
+export const messageReadStatus = mysqlTable("message_read_status", {
+  id: int("id").autoincrement().primaryKey(),
+  messageId: int("messageId").notNull(),
+  userId: int("userId").notNull(),
+  readAt: timestamp("readAt").defaultNow().notNull(),
+}, (table) => ({
+  messageIdx: index("read_message_idx").on(table.messageId),
+  userIdx: index("read_user_idx").on(table.userId),
+  messageUserIdx: uniqueIndex("read_msg_user_idx").on(table.messageId, table.userId),
+}));
+
+export type MessageReadStatus = typeof messageReadStatus.$inferSelect;
+export type InsertMessageReadStatus = typeof messageReadStatus.$inferInsert;

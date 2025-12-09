@@ -822,3 +822,16 @@ export async function getRevenueReports(startDate?: string, endDate?: string) {
   // Mock revenue data
   return [];
 }
+
+
+export async function updateUser(userId: number, updates: {
+  name?: string;
+  email?: string;
+  profilePhotoUrl?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  
+  await db.update(users).set(updates).where(eq(users.id, userId));
+  return true;
+}

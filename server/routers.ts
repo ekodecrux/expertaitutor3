@@ -15,6 +15,7 @@ import { stripeRouter } from "./routers-stripe";
 import { teacherRouter } from "./routers-teacher";
 import { parentRouter } from "./routers-parent";
 import { superAdminRouter } from "./routers-superadmin";
+import { messagingRouter } from "./routers-messaging";
 
 // ============= RBAC MIDDLEWARE =============
 
@@ -130,6 +131,21 @@ export const appRouter = router({
       .input(z.object({ token: z.string() }))
       .query(async ({ input }) => {
         return await auth.getResetTokenInfo(input.token);
+      }),
+    updateProfile: protectedProcedure
+      .input(z.object({
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+        profilePhotoUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const updates: any = {};
+        if (input.name) updates.name = input.name;
+        if (input.email) updates.email = input.email;
+        if (input.profilePhotoUrl) updates.profilePhotoUrl = input.profilePhotoUrl;
+
+        await db.updateUser(ctx.user.id, updates);
+        return { success: true };
       }),
   }),
 
@@ -672,8 +688,8 @@ Provide a week-by-week breakdown with topics to cover.`,
   parent: parentRouter,
 
   // ============= SUPER ADMIN MANAGEMENT =============
-  
   superadmin: superAdminRouter,
+  messaging: messagingRouter,
 
   // ============= FILE UPLOAD =============
   

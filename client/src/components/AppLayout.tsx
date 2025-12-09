@@ -1,7 +1,15 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
@@ -21,6 +29,8 @@ import {
   LogOut,
   Menu,
   MessageSquare,
+  Settings,
+  User,
   Sparkles,
   Users,
   Video,
@@ -111,23 +121,49 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </div>
         </div>
 
-        {/* User Profile */}
+        {/* User Profile with Dropdown */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 flex-shrink-0">
-              <AvatarFallback className="bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300">
-                {userInitials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                {user?.name || "User"}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 capitalize truncate">
-                {user?.role || "Student"}
-              </p>
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-3 w-full hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors">
+                <Avatar className="h-10 w-10 flex-shrink-0">
+                  <AvatarImage src={user?.profilePhotoUrl || undefined} />
+                  <AvatarFallback className="bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {user?.name || "User"}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 capitalize truncate">
+                    {user?.role?.replace('_', ' ') || "Student"}
+                  </p>
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/profile-settings" className="cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Profile Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/messages" className="cursor-pointer">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Messages
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
+                <LogOut className="mr-2 h-4 w-4" />
+                {logoutMutation.isPending ? "Logging out..." : "Logout"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Navigation */}

@@ -963,3 +963,167 @@
 - Feature prioritization for next sprint
 
 ---
+
+
+## Phase 49: Messaging System + Profile Upload + RBAC (December 2025)
+
+### Messaging System
+- [ ] Create messages table in database schema
+- [ ] Create conversations table for chat threads
+- [ ] Create conversation_participants table for group chats
+- [ ] Add message_read_status table for read receipts
+- [ ] Build messaging backend router with endpoints:
+  - [ ] createConversation (1-on-1 or group)
+  - [ ] sendMessage
+  - [ ] getConversations (list all chats)
+  - [ ] getMessages (get chat history)
+  - [ ] markAsRead
+  - [ ] getUnreadCount
+- [ ] Create Messages page component (shared across roles)
+- [ ] Build ChatInterface component with real-time updates
+- [ ] Add parent-teacher chat functionality
+- [ ] Implement student group chat functionality
+- [ ] Add message notifications
+- [ ] Implement message search and filtering
+
+### Profile Photo Upload
+- [ ] Add profilePhotoUrl field to users table
+- [ ] Create profile photo upload backend endpoint
+- [ ] Integrate S3 storage for photo uploads
+- [ ] Build ProfilePhotoUpload component
+- [ ] Add photo preview and crop functionality
+- [ ] Update Avatar components to show uploaded photos
+- [ ] Add photo upload to user profile settings
+- [ ] Implement photo deletion functionality
+
+### Backend RBAC Enforcement
+- [ ] Create roleHierarchy middleware
+- [ ] Add role checking utilities (isSuperAdmin, isAdmin, etc.)
+- [ ] Update all admin procedures to allow super_admin access
+- [ ] Add RBAC checks to teacher procedures
+- [ ] Add RBAC checks to parent procedures
+- [ ] Create adminOrSuperAdminProcedure helper
+- [ ] Test role hierarchy enforcement
+- [ ] Add audit logging for admin actions
+
+**Priority:** HIGH - Critical user-facing features
+**Estimated Time:** 2-3 hours
+
+
+## URGENT: UI/UX Fixes (December 2025)
+
+### Super Admin vs Institute Admin Distinction
+- [ ] Super Admin should show PLATFORM-WIDE features (all organizations, system settings, subscriptions)
+- [ ] Institute Admin should show INSTITUTION-LEVEL features (only their institution's users/content)
+- [ ] Update Super Admin dashboard to show platform metrics (total organizations, total users across all orgs)
+- [ ] Update Institute Admin dashboard to show only their institution's metrics
+- [ ] Ensure Super Admin navigation has unique platform management section
+- [ ] Remove platform management from Institute Admin navigation
+
+### Missing UI Elements
+- [ ] Add visible logout button to AppLayout sidebar (currently exists but may not be visible)
+- [ ] Add back buttons to all detail/sub pages
+- [ ] Create Profile page for all user roles
+- [ ] Add profile photo upload functionality
+- [ ] Add profile edit functionality (name, email, password change)
+- [ ] Add profile link to navigation menu
+
+### UI Overlay Issues
+- [ ] Fix navigation items overlapping
+- [ ] Check sidebar width and padding
+- [ ] Ensure proper z-index for overlays
+- [ ] Test responsive behavior on different screen sizes
+
+**Priority:** CRITICAL - User-reported issues affecting usability
+
+
+## Phase 50: Complete UI/UX Overhaul to World-Class Standards (December 2025)
+
+### Design System Foundation
+- [ ] Define professional color palette (primary, secondary, accent, semantic colors)
+- [ ] Establish typography scale (headings, body, captions with proper weights)
+- [ ] Create spacing system (consistent margins, padding, gaps)
+- [ ] Add smooth animations and transitions (fade, slide, scale)
+- [ ] Define shadow system (subtle elevation for cards, modals)
+- [ ] Set up responsive breakpoints
+
+### Navigation & Layout Excellence
+- [ ] Redesign AppLayout with polished sidebar
+- [ ] Add collapsible sidebar with smooth animation
+- [ ] Implement profile dropdown menu (Profile, Settings, Logout)
+- [ ] Add breadcrumb navigation to all pages
+- [ ] Create back button component for detail pages
+- [ ] Add notification bell with unread count
+- [ ] Implement search bar in header
+- [ ] Add keyboard shortcuts (Cmd+K for search, etc.)
+
+### Super Admin Dashboard (Platform-Wide)
+- [ ] Platform overview cards (Total Organizations, Total Users, Revenue, Active Subscriptions)
+- [ ] Revenue chart (line/bar chart showing monthly trends)
+- [ ] Organization list table with search, filter, sort
+- [ ] Recent activity feed
+- [ ] System health indicators
+- [ ] Quick actions panel
+
+### Institute Admin Dashboard (Institution-Level)
+- [ ] Institution metrics cards (Students, Teachers, Parents, Courses)
+- [ ] Enrollment trends chart
+- [ ] Recent user registrations
+- [ ] Content approval queue
+- [ ] Performance analytics
+- [ ] Quick actions (Add User, Approve Content)
+
+### Teacher Dashboard (Class-Focused)
+- [ ] My Classes grid with student count, schedule
+- [ ] Upcoming classes timeline
+- [ ] Recent assignments with submission status
+- [ ] Student performance chart
+- [ ] Quick actions (Create Assignment, Take Attendance)
+- [ ] Notifications panel
+
+### Parent Dashboard (Child-Centric)
+- [ ] Children cards with photo, grade, attendance
+- [ ] Progress charts per child
+- [ ] Upcoming events calendar
+- [ ] Recent activities timeline
+- [ ] Teacher messages
+- [ ] Quick actions (Message Teacher, View Report Card)
+
+### Student Dashboard (Learning-Focused)
+- [ ] Welcome banner with motivational message
+- [ ] Progress rings (Course completion, Streak, Points)
+- [ ] Knowledge map visualization
+- [ ] Recommended courses carousel
+- [ ] Recent achievements with badges
+- [ ] Quick actions (Continue Learning, Take Assessment)
+- [ ] Leaderboard widget
+
+### Profile Management
+- [ ] Profile page with photo upload
+- [ ] Crop and preview before upload
+- [ ] Edit personal information (name, email, phone)
+- [ ] Change password form
+- [ ] Notification preferences
+- [ ] Privacy settings
+- [ ] Account deletion option
+
+### UI Polish & Interactions
+- [ ] Loading skeletons for all data tables
+- [ ] Empty states with illustrations and CTAs
+- [ ] Error states with retry buttons
+- [ ] Toast notifications for actions
+- [ ] Confirmation modals for destructive actions
+- [ ] Hover effects on all interactive elements
+- [ ] Focus states for keyboard navigation
+- [ ] Smooth page transitions
+- [ ] Optimistic UI updates
+
+### Responsive Design
+- [ ] Mobile-first approach
+- [ ] Tablet layout optimization
+- [ ] Desktop layout with proper spacing
+- [ ] Touch-friendly buttons and inputs
+- [ ] Hamburger menu for mobile
+
+**Priority:** HIGHEST - Complete platform redesign for world-class UX
+**Estimated Time:** 4-6 hours

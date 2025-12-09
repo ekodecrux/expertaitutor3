@@ -68,6 +68,8 @@ import PaymentHistory from "./pages/PaymentHistory";
 import ContentLibrary from "./pages/ContentLibrary";
 import Favorites from "./pages/Favorites";
 import Recommendations from "./pages/Recommendations";
+import Messages from "./pages/Messages";
+import ProfileSettings from "./pages/ProfileSettings";
 import { useAuth } from "./_core/hooks/useAuth";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
@@ -464,6 +466,20 @@ function Router() {
       <Route path="/recommendations">
         <ProtectedRoute>
           <Recommendations />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Messages Route */}
+      <Route path="/messages">
+        <ProtectedRoute>
+          <Messages />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Profile Settings Route */}
+      <Route path="/profile-settings">
+        <ProtectedRoute>
+          <ProfileSettings />
         </ProtectedRoute>
       </Route>
       

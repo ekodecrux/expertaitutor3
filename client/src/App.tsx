@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -25,118 +25,148 @@ import AITutorWithAvatar from "./pages/AITutorWithAvatar";
 import LessonNarration from "./pages/LessonNarration";
 import AssessmentAnalysis from "./pages/AssessmentAnalysis";
 import ParentTeacherMeeting from "./pages/ParentTeacherMeeting";
+import { useAuth } from "./_core/hooks/useAuth";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
+
+// Protected route wrapper
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, loading } = useAuth();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      setLocation("/login");
+    }
+  }, [isAuthenticated, loading, setLocation]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return <AppLayout>{children}</AppLayout>;
+}
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path="/" component={Login} />
+      <Route path="/home" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       
       {/* Protected routes with AppLayout */}
-      <Route path={"/dashboard"}>
-        <AppLayout>
+      <Route path="/dashboard">
+        <ProtectedRoute>
           <Dashboard />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/courses"}>
-        <AppLayout>
+      <Route path="/courses">
+        <ProtectedRoute>
           <Courses />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/videos"}>
-        <AppLayout>
+      <Route path="/videos">
+        <ProtectedRoute>
           <VideoLessons />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/lesson-plan"}>
-        <AppLayout>
+      <Route path="/lesson-plan">
+        <ProtectedRoute>
           <LessonPlan />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/assessments"}>
-        <AppLayout>
+      <Route path="/assessments">
+        <ProtectedRoute>
           <Assessments />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/ai-tutor"}>
-        <AppLayout>
+      <Route path="/ai-tutor">
+        <ProtectedRoute>
           <AITutor />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/chat-tutor"}>
-        <AppLayout>
+      <Route path="/chat-tutor">
+        <ProtectedRoute>
           <ChatTutor />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/rewards"}>
-        <AppLayout>
+      <Route path="/rewards">
+        <ProtectedRoute>
           <Rewards />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/progress"}>
-        <AppLayout>
+      <Route path="/progress">
+        <ProtectedRoute>
           <Progress />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/support"}>
-        <AppLayout>
+      <Route path="/support">
+        <ProtectedRoute>
           <Support />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/profile"}>
-        <AppLayout>
+      <Route path="/profile">
+        <ProtectedRoute>
           <Profile />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/doubts"}>
-        <AppLayout>
+      <Route path="/doubts">
+        <ProtectedRoute>
           <Doubts />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/tests"}>
-        <AppLayout>
+      <Route path="/tests">
+        <ProtectedRoute>
           <Tests />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/ai-tutor-avatar"}>
-        <AppLayout>
+      <Route path="/ai-tutor-avatar">
+        <ProtectedRoute>
           <AITutorWithAvatar />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/lesson-narration"}>
-        <AppLayout>
+      <Route path="/lesson-narration">
+        <ProtectedRoute>
           <LessonNarration />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/assessment-analysis"}>
-        <AppLayout>
+      <Route path="/assessment-analysis">
+        <ProtectedRoute>
           <AssessmentAnalysis />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/parent-teacher-meeting"}>
-        <AppLayout>
+      <Route path="/parent-teacher-meeting">
+        <ProtectedRoute>
           <ParentTeacherMeeting />
-        </AppLayout>
+        </ProtectedRoute>
       </Route>
       
-      <Route path={"/404"} component={NotFound} />
+      <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );

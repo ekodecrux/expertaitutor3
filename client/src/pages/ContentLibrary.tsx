@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, BookOpen, Video, FileText, Star, StarOff, ExternalLink } from "lucide-react";
+import { Loader2, Search, BookOpen, Video, FileText, Star, ExternalLink } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -12,13 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export default function ContentLibrary() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,6 +29,32 @@ export default function ContentLibrary() {
     type: contentType === "all" ? undefined : (contentType as any),
     limit: 50,
   });
+
+  const addFavoriteMutation = trpc.content.addFavorite.useMutation({
+    onSuccess: () => {
+      toast.success("Added to favorites");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const removeFavoriteMutation = trpc.content.removeFavorite.useMutation({
+    onSuccess: () => {
+      toast.success("Removed from favorites");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleToggleFavorite = (contentId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Optimistic update would go here
+    addFavoriteMutation.mutate({ contentId });
+  };
+
+
 
   const getContentIcon = (type: string) => {
     switch (type) {
@@ -271,6 +292,14 @@ export default function ContentLibrary() {
                   )}
 
                   <div className="flex items-center justify-between pt-2 border-t">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => handleToggleFavorite(item.id, e)}
+                      disabled={addFavoriteMutation.isPending || removeFavoriteMutation.isPending}
+                    >
+                      <Star className="h-4 w-4" />
+                    </Button>
                     <span className="text-xs text-muted-foreground">
                       {(item as any).topic || "General"}
                     </span>

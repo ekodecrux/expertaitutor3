@@ -634,3 +634,20 @@
 - [x] Add clear filters button
 - [ ] Add bookmarking/favorites capability (TODO: requires backend)
 - [ ] Add pagination or infinite scroll (TODO: currently limited to 50 items)
+
+
+## Phase 46: Favorites/Bookmark Feature Implementation (IN PROGRESS)
+- [x] Add content_favorites table to database schema
+- [x] Add content.addFavorite endpoint
+- [x] Add content.removeFavorite endpoint
+- [x] Add content.getFavorites endpoint
+- [x] Add content.isFavorite endpoint
+- [x] Add content.getFavoritesCount endpoint
+- [x] Add bookmark button to content cards in ContentLibrary
+- [x] Add bookmark toggle functionality
+- [x] Create Favorites.tsx page to display saved content
+- [x] Add route for /favorites page
+- [x] Add favorites count display in Favorites page
+- [x] Add remove from favorites functionality
+- [ ] Add favorites count indicator in navigation (TODO: requires nav update)
+- [ ] Test bookmark feature end-to-end

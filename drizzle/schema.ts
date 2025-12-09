@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, index, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, index, uniqueIndex, json } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
 /**
@@ -767,3 +767,18 @@ export const scrapingLogs = mysqlTable("scraping_logs", {
 export type ScrapingLog = typeof scrapingLogs.$inferSelect;
 export type InsertScrapingLog = typeof scrapingLogs.$inferInsert;
 
+
+// Content Favorites (Bookmarks)
+export const contentFavorites = mysqlTable("content_favorites", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  contentId: int("content_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  userContentIdx: uniqueIndex("user_content_idx").on(table.userId, table.contentId),
+  userIdx: index("favorite_user_idx").on(table.userId),
+  contentIdx: index("favorite_content_idx").on(table.contentId),
+}));
+
+export type ContentFavorite = typeof contentFavorites.$inferSelect;
+export type InsertContentFavorite = typeof contentFavorites.$inferInsert;

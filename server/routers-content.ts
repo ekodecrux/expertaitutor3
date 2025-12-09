@@ -8,8 +8,9 @@ import {
   contentApprovalQueue, 
   scrapingLogs,
   contentItems,
+  contentFavorites,
 } from "../drizzle/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, inArray, sql } from "drizzle-orm";
 import { runScraper, runScraperV2 } from "./content-scraper";
 
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -20,6 +21,90 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 export const contentRouter = router({
+  // ============= FAVORITES/BOOKMARKS =============
+  
+  addFavorite: protectedProcedure
+    .input(z.object({ contentId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      await db.insert(contentFavorites).values({
+        userId: ctx.user.id,
+        contentId: input.contentId,
+      }).onDuplicateKeyUpdate({ set: { userId: ctx.user.id } });
+
+      return { success: true };
+    }),
+
+  removeFavorite: protectedProcedure
+    .input(z.object({ contentId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      await db.delete(contentFavorites)
+        .where(and(
+          eq(contentFavorites.userId, ctx.user.id),
+          eq(contentFavorites.contentId, input.contentId)
+        ));
+
+      return { success: true };
+    }),
+
+  getFavorites: protectedProcedure
+    .input(z.object({ limit: z.number().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const favorites = await db.select()
+        .from(contentFavorites)
+        .where(eq(contentFavorites.userId, ctx.user.id))
+        .orderBy(desc(contentFavorites.createdAt))
+        .limit(input?.limit || 100);
+
+      // Get content details for each favorite
+      const contentIds = favorites.map(f => f.contentId);
+      if (contentIds.length === 0) return [];
+
+      const content = await db.select()
+        .from(contentItems)
+        .where(inArray(contentItems.id, contentIds));
+
+      return content;
+    }),
+
+  isFavorite: protectedProcedure
+    .input(z.object({ contentId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return false;
+
+      const [favorite] = await db.select()
+        .from(contentFavorites)
+        .where(and(
+          eq(contentFavorites.userId, ctx.user.id),
+          eq(contentFavorites.contentId, input.contentId)
+        ))
+        .limit(1);
+
+      return !!favorite;
+    }),
+
+  getFavoritesCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return 0;
+
+      const [result] = await db.select({ count: sql<number>`count(*)` })
+        .from(contentFavorites)
+        .where(eq(contentFavorites.userId, ctx.user.id));
+
+      return result?.count || 0;
+    }),
+
+
   // ============= CONTENT SOURCES MANAGEMENT =============
   
   getSources: adminProcedure

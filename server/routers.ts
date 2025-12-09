@@ -78,17 +78,17 @@ export const appRouter = router({
         return result;
       }),
     requestOTP: publicProcedure
-      .input(z.object({ email: z.string().email() }))
+      .input(z.object({ mobileOrEmail: z.string() }))
       .mutation(async ({ input }) => {
-        return await auth.requestOTP(input.email);
+        return await auth.requestOTP(input.mobileOrEmail);
       }),
     verifyOTP: publicProcedure
       .input(z.object({
-        email: z.string().email(),
+        mobileOrEmail: z.string(),
         otp: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const result = await auth.verifyOTP(input.email, input.otp);
+        const result = await auth.verifyOTP(input.mobileOrEmail, input.otp);
         // Set session cookie
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, result.token, cookieOptions);

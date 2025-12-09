@@ -48,7 +48,7 @@ export default function Register() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-          <CardDescription>Join ExpertAitutor and start your learning journey</CardDescription>
+          <CardDescription>Join ACES-AIProfessor and start your learning journey</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -678,3 +678,14 @@
 - [x] Create deployment package (aces-aiprofessor-deployment.tar.gz - 3.8MB)
 - [x] Include all necessary files (dist, server, drizzle, shared, package.json)
 - [ ] Test deployment on actual Hostinger server (requires user's server access)
+
+
+## Phase 50: Critical Bug Fixes (PARTIALLY COMPLETED)
+- [x] Fix registration endpoint to return proper user data and token
+- [x] Add mobile number field to users table
+- [x] Update OTP flow to accept mobile numbers instead of email
+- [x] Update Register page branding from ExpertAitutor to ACES-AIProfessor
+- [x] Update Login page branding to ACES-AIProfessor
+- [ ] Debug remaining registration 500 error (needs investigation)
+- [ ] Test registration flow end-to-end
+- [ ] Test OTP login flow end-to-end

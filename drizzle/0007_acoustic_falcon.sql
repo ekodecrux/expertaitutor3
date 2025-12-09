@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `mobile` varchar(20);

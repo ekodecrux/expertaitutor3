@@ -98,7 +98,26 @@ export async function registerUser(data: {
     lastSignedIn: new Date(),
   });
 
-  return { userId: 1 }; // ID will be auto-generated
+  // Get the created user
+  const newUser = await db.select().from(users).where(eq(users.email, data.email)).limit(1);
+  if (newUser.length === 0) {
+    throw new Error("Failed to create user");
+  }
+
+  const user = newUser[0];
+  const token = await generateToken(user.id, user.email || data.email, user.role);
+
+  return {
+    success: true,
+    userId: user.id,
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  };
 }
 
 // Login user
@@ -152,11 +171,15 @@ export async function loginUser(email: string, password: string) {
 }
 
 // Request OTP
-export async function requestOTP(email: string) {
+export async function requestOTP(mobileOrEmail: string) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
 
-  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  // Check if input is mobile number (digits only) or email
+  const isMobile = /^\d+$/.test(mobileOrEmail);
+  const result = isMobile
+    ? await db.select().from(users).where(eq(users.mobile, mobileOrEmail)).limit(1)
+    : await db.select().from(users).where(eq(users.email, mobileOrEmail)).limit(1);
   if (result.length === 0) {
     return { success: true }; // Don't reveal if email exists
   }
@@ -170,21 +193,25 @@ export async function requestOTP(email: string) {
     updatedAt: new Date(),
   }).where(eq(users.id, result[0].id));
 
-  // OTP will be sent via email service in production
+  // OTP will be sent via SMS/email service in production
   // For development, OTP is logged to console
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[Auth] OTP for ${email}: ${otp}`);
+    console.log(`[Auth] OTP for ${mobileOrEmail}: ${otp}`);
   }
 
   return { success: true };
 }
 
 // Verify OTP
-export async function verifyOTP(email: string, otp: string) {
+export async function verifyOTP(mobileOrEmail: string, otp: string) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
 
-  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  // Check if input is mobile number (digits only) or email
+  const isMobile = /^\d+$/.test(mobileOrEmail);
+  const result = isMobile
+    ? await db.select().from(users).where(eq(users.mobile, mobileOrEmail)).limit(1)
+    : await db.select().from(users).where(eq(users.email, mobileOrEmail)).limit(1);
   if (result.length === 0) {
     throw new Error("Invalid OTP");
   }

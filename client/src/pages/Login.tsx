@@ -13,6 +13,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mobileOrEmail, setMobileOrEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
@@ -29,7 +30,7 @@ export default function Login() {
   const requestOTPMutation = trpc.auth.requestOTP.useMutation({
     onSuccess: () => {
       setOtpSent(true);
-      toast.success("OTP sent to your email!");
+      toast.success("OTP sent to your mobile number!");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -53,12 +54,12 @@ export default function Login() {
 
   const handleRequestOTP = (e: React.FormEvent) => {
     e.preventDefault();
-    requestOTPMutation.mutate({ email });
+    requestOTPMutation.mutate({ mobileOrEmail });
   };
 
   const handleVerifyOTP = (e: React.FormEvent) => {
     e.preventDefault();
-    verifyOTPMutation.mutate({ email, otp });
+    verifyOTPMutation.mutate({ mobileOrEmail, otp });
   };
 
   return (
@@ -130,13 +131,13 @@ export default function Login() {
               {!otpSent ? (
                 <form onSubmit={handleRequestOTP} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="otp-email">Email</Label>
+                    <Label htmlFor="otp-mobile">Mobile Number</Label>
                     <Input
-                      id="otp-email"
-                      type="email"
-                      placeholder="student@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="otp-mobile"
+                      type="tel"
+                      placeholder="+1234567890"
+                      value={mobileOrEmail}
+                      onChange={(e) => setMobileOrEmail(e.target.value)}
                       required
                     />
                   </div>

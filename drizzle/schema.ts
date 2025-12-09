@@ -9,6 +9,7 @@ export const users = mysqlTable("users", {
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  mobile: varchar("mobile", { length: 20 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["student", "parent", "teacher", "admin", "institution_admin", "branch_admin", "super_admin"]).default("student").notNull(),
   institutionId: int("institutionId"),

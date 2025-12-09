@@ -50,6 +50,13 @@
       "when": 1765287169203,
       "tag": "0006_petite_tattoo",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1765292879814,
+      "tag": "0007_acoustic_falcon",
+      "breakpoints": true
     }
   ]
 }

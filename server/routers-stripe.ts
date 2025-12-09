@@ -9,7 +9,7 @@ import Stripe from "stripe";
 import { SUBSCRIPTION_PLANS, ONE_TIME_PRODUCTS } from "./stripe-products";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-11-17.clover",
 });
 
 export const stripeRouter = router({
@@ -202,8 +202,10 @@ export const stripeRouter = router({
           ...subscription,
           stripeData: {
             status: stripeSubscription.status,
-            currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
-            cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+            currentPeriodEnd: (stripeSubscription as any).current_period_end 
+              ? new Date((stripeSubscription as any).current_period_end * 1000)
+              : null,
+            cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end || false,
             trialEnd: stripeSubscription.trial_end 
               ? new Date(stripeSubscription.trial_end * 1000) 
               : null,

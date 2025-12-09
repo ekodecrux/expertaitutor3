@@ -29,6 +29,9 @@ import AssessmentAnalysis from "./pages/AssessmentAnalysis";
 import ParentTeacherMeeting from "./pages/ParentTeacherMeeting";
 import ContentApprovalQueue from "./pages/admin/ContentApprovalQueue";
 import ContentSourcesManagement from "./pages/admin/ContentSourcesManagement";
+import SubscriptionManagement from "./pages/SubscriptionManagement";
+import PaymentHistory from "./pages/PaymentHistory";
+import ContentLibrary from "./pages/ContentLibrary";
 import { useAuth } from "./_core/hooks/useAuth";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
@@ -182,6 +185,26 @@ function Router() {
       <Route path="/admin/content-sources">
         <ProtectedRoute>
           <ContentSourcesManagement />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Subscription & Billing Routes */}
+      <Route path="/subscription">
+        <ProtectedRoute>
+          <SubscriptionManagement />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/payments">
+        <ProtectedRoute>
+          <PaymentHistory />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Content Library Route */}
+      <Route path="/content-library">
+        <ProtectedRoute>
+          <ContentLibrary />
         </ProtectedRoute>
       </Route>
       

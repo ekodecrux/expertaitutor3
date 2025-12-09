@@ -36,10 +36,11 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
-// Generate JWT
-export async function generateToken(userId: number, email: string, role: string): Promise<string> {
-  return new SignJWT({ userId, email, role })
-    .setProtectedHeader({ alg: "HS256" })
+// Generate JWT - Must match Manus OAuth format (openId, appId, name)
+export async function generateToken(openId: string, name: string): Promise<string> {
+  const appId = process.env.VITE_APP_ID || "";
+  return new SignJWT({ openId, appId, name })
+    .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setIssuedAt()
     .setExpirationTime("7d")
     .sign(JWT_SECRET);
@@ -110,7 +111,7 @@ export async function registerUser(data: {
   }
 
   const user = newUser[0];
-  const token = await generateToken(user.id, user.email || data.email, user.role);
+  const token = await generateToken(user.openId, user.name || data.name);
 
   console.log('[Auth] Registration successful for user:', user.id);
   return {
@@ -175,7 +176,7 @@ export async function loginUser(email: string, password: string) {
   }).where(eq(users.id, user.id));
 
   // Generate token
-  const token = await generateToken(user.id, user.email!, user.role);
+  const token = await generateToken(user.openId, user.name || user.email || "User");
 
   return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
 }
@@ -251,7 +252,7 @@ export async function verifyOTP(mobileOrEmail: string, otp: string) {
   }).where(eq(users.id, user.id));
 
   // Generate token
-  const token = await generateToken(user.id, user.email!, user.role);
+  const token = await generateToken(user.openId, user.name || user.email || "User");
 
   return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
 }

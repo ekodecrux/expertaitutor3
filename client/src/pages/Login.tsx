@@ -7,10 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { GraduationCap, Mail, Smartphone } from "lucide-react";
 
 export default function Login() {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+  const utils = trpc.useUtils();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mobileOrEmail, setMobileOrEmail] = useState("");
@@ -18,9 +21,14 @@ export default function Login() {
   const [otpSent, setOtpSent] = useState(false);
 
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Login successful!");
-      window.location.href = "/dashboard";
+      // Invalidate and refetch the auth.me query to update authentication state
+      await utils.auth.me.invalidate();
+      // Small delay to ensure cookie is set
+      setTimeout(() => {
+        setLocation("/dashboard");
+      }, 100);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -38,9 +46,14 @@ export default function Login() {
   });
 
   const verifyOTPMutation = trpc.auth.verifyOTP.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Login successful!");
-      window.location.href = "/dashboard";
+      // Invalidate and refetch the auth.me query to update authentication state
+      await utils.auth.me.invalidate();
+      // Small delay to ensure cookie is set
+      setTimeout(() => {
+        setLocation("/dashboard");
+      }, 100);
     },
     onError: (error) => {
       toast.error(error.message);

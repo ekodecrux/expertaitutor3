@@ -741,3 +741,12 @@
 - [x] Add environment variables for Twilio credentials (optional)
 - [x] Make Twilio optional - works without credentials for testing
 - [ ] Test mobile OTP flow end-to-end with valid Twilio account
+
+
+## CRITICAL BUG FIXES (December 2025)
+- [x] Fixed login authentication - JWT token format mismatch between custom auth and Manus OAuth
+- [x] Updated generateToken() to use {openId, appId, name} format instead of {userId, email, role}
+- [x] Fixed post-login redirect - invalidate auth.me query and use setLocation() instead of window.location.href
+- [x] Verified login working for all test accounts (student1@acesaiprofessor.com / demo123)
+- [ ] Fix Twilio SMS OTP delivery (verify TWILIO_ACCOUNT_SID format)
+- [ ] Test all 5 user roles (superadmin, admin, teacher, student, parent) login and dashboard access

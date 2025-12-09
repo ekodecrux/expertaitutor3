@@ -152,3 +152,36 @@
 - [ ] Create avatar settings (voice, speed, personality)
 - [x] Implement avatar learning path recommendations
 - [x] Add avatar celebration animations for achievements
+
+
+## Phase 17: Real-time Integration & Clerk Authentication
+- [x] Change landing page background from gradient purple to white
+- [x] Verify Dashboard uses real database queries (already implemented)
+- [ ] Remove all dummy/mock data from Dashboard
+- [ ] Remove all dummy/mock data from Lesson Narration
+- [ ] Remove all dummy/mock data from Assessment Analysis
+- [ ] Remove all dummy/mock data from Parent-Teacher Meeting
+- [ ] Connect Dashboard to real database queries
+- [ ] Connect Courses page to real database
+- [ ] Connect Video Lessons to real database
+- [ ] Connect Assessments to real database
+- [ ] Integrate Clerk authentication service
+- [ ] Implement 5-role system (Super Admin, Institution Admin, Teacher, Student, Parent)
+- [ ] Create Super Admin dashboard for SaaS onboarding
+- [ ] Build institution onboarding workflow
+- [ ] Add role-based access control throughout platform
+- [ ] Create proper login/signup pages with Clerk
+- [ ] Add social login (Google, Facebook) via Clerk
+- [ ] Implement OTP login via Clerk
+
+
+## Phase 18: Multi-lingual Support
+- [ ] Add language selector component
+- [ ] Implement i18n library (react-i18next)
+- [ ] Create translation files for Indian languages (Hindi, Tamil, Telugu, Kannada, Malayalam, Bengali, Gujarati, Marathi)
+- [ ] Create translation files for international languages (Spanish, French, Arabic, Chinese, Japanese)
+- [ ] Add RTL support for Arabic
+- [ ] Translate all UI text and labels
+- [ ] Store user language preference in database
+- [ ] Add language-specific content in database schema
+- [ ] Implement language switching without page reload

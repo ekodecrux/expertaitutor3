@@ -22,6 +22,13 @@
       "when": 1765281239486,
       "tag": "0002_daffy_spitfire",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1765281573440,
+      "tag": "0003_jazzy_microchip",
+      "breakpoints": true
     }
   ]
 }

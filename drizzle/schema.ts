@@ -531,3 +531,124 @@ export const notifications = mysqlTable("notifications", {
 }));
 
 export type Notification = typeof notifications.$inferSelect;
+
+
+/**
+ * Classes for organizing students by grade/curriculum
+ */
+export const classes = mysqlTable("classes", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  branchId: int("branchId"),
+  name: varchar("name", { length: 100 }).notNull(),
+  curriculum: varchar("curriculum", { length: 100 }),
+  board: varchar("board", { length: 100 }),
+  academicYear: varchar("academicYear", { length: 20 }),
+  maxStudents: int("maxStudents").default(40),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  orgIdx: index("org_class_idx").on(table.organizationId),
+  branchIdx: index("branch_class_idx").on(table.branchId),
+}));
+
+export type Class = typeof classes.$inferSelect;
+export type InsertClass = typeof classes.$inferInsert;
+
+/**
+ * Sections within classes
+ */
+export const sections = mysqlTable("sections", {
+  id: int("id").autoincrement().primaryKey(),
+  classId: int("classId").notNull(),
+  name: varchar("name", { length: 10 }).notNull(),
+  maxStudents: int("maxStudents").default(40),
+  currentStudents: int("currentStudents").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  classIdx: index("section_class_idx").on(table.classId),
+}));
+
+export type Section = typeof sections.$inferSelect;
+export type InsertSection = typeof sections.$inferInsert;
+
+/**
+ * Subject-teacher assignments
+ */
+export const classSubjects = mysqlTable("class_subjects", {
+  id: int("id").autoincrement().primaryKey(),
+  classId: int("classId").notNull(),
+  subjectId: int("subjectId").notNull(),
+  teacherUserId: int("teacherUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  classIdx: index("cs_class_idx").on(table.classId),
+  teacherIdx: index("cs_teacher_idx").on(table.teacherUserId),
+}));
+
+export type ClassSubject = typeof classSubjects.$inferSelect;
+export type InsertClassSubject = typeof classSubjects.$inferInsert;
+
+/**
+ * Student enrollments
+ */
+export const studentEnrollments = mysqlTable("student_enrollments", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull(),
+  classId: int("classId").notNull(),
+  sectionId: int("sectionId"),
+  enrollmentDate: timestamp("enrollmentDate").defaultNow().notNull(),
+  status: mysqlEnum("status", ["active", "inactive", "graduated", "transferred"]).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  studentIdx: index("enroll_student_idx").on(table.studentUserId),
+  classIdx: index("enroll_class_idx").on(table.classId),
+  sectionIdx: index("enroll_section_idx").on(table.sectionId),
+}));
+
+export type StudentEnrollment = typeof studentEnrollments.$inferSelect;
+export type InsertStudentEnrollment = typeof studentEnrollments.$inferInsert;
+
+/**
+ * Organization subscriptions (enhanced)
+ */
+export const organizationSubscriptions = mysqlTable("organization_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  planId: int("planId").notNull(),
+  status: mysqlEnum("status", ["trial", "active", "past_due", "cancelled", "expired"]).default("trial").notNull(),
+  trialEndsAt: timestamp("trialEndsAt"),
+  currentPeriodStart: timestamp("currentPeriodStart").notNull(),
+  currentPeriodEnd: timestamp("currentPeriodEnd").notNull(),
+  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  orgIdx: index("org_sub_idx").on(table.organizationId),
+  planIdx: index("plan_sub_idx").on(table.planId),
+}));
+
+export type OrganizationSubscription = typeof organizationSubscriptions.$inferSelect;
+export type InsertOrganizationSubscription = typeof organizationSubscriptions.$inferInsert;
+
+/**
+ * Subscription usage tracking
+ */
+export const subscriptionUsage = mysqlTable("subscription_usage", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  metricName: varchar("metricName", { length: 50 }).notNull(),
+  currentValue: int("currentValue").default(0),
+  limitValue: int("limitValue").notNull(),
+  periodStart: timestamp("periodStart").notNull(),
+  periodEnd: timestamp("periodEnd").notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  orgIdx: index("usage_org_idx").on(table.organizationId),
+  metricIdx: index("usage_metric_idx").on(table.metricName),
+}));
+
+export type SubscriptionUsage = typeof subscriptionUsage.$inferSelect;
+export type InsertSubscriptionUsage = typeof subscriptionUsage.$inferInsert;

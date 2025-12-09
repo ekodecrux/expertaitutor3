@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { v4 as uuidv4 } from "uuid";
 import { getDb } from "./db";
+import { sendOTPSMS } from "./sms-service";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
@@ -202,10 +203,16 @@ export async function requestOTP(mobileOrEmail: string) {
     updatedAt: new Date(),
   }).where(eq(users.id, result[0].id));
 
-  // OTP will be sent via SMS/email service in production
-  // For development, OTP is logged to console
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Auth] OTP for ${mobileOrEmail}: ${otp}`);
+  // Send OTP via SMS for mobile numbers, log for development
+  const isMobileNumber = /^\+?[1-9]\d{1,14}$/.test(mobileOrEmail);
+  
+  if (isMobileNumber) {
+    const smsSent = await sendOTPSMS(mobileOrEmail, otp);
+    if (!smsSent && process.env.NODE_ENV !== 'production') {
+      console.log(`[Auth] SMS delivery failed, OTP for ${mobileOrEmail}: ${otp}`);
+    }
+  } else if (process.env.NODE_ENV === 'development') {
+    console.log(`[Auth] Email OTP for ${mobileOrEmail}: ${otp}`);
   }
 
   return { success: true };

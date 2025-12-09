@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import {
   Award,
@@ -13,14 +16,13 @@ import {
   FileText,
   Play,
   Target,
-  TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function Tests() {
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
-  const [activeTest, setActiveTest] = useState<any>(null);
+  const [activeTestId, setActiveTestId] = useState<number | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [attemptId, setAttemptId] = useState<number | null>(null);
@@ -28,7 +30,7 @@ export default function Tests() {
   const [testResults, setTestResults] = useState<any>(null);
 
   const { data: subjects } = trpc.curriculum.getSubjects.useQuery({
-    curriculum: 'CBSE', // This should come from user profile
+    curriculum: 'CBSE',
   });
 
   const { data: tests } = trpc.tests.getBySubject.useQuery(
@@ -36,11 +38,18 @@ export default function Tests() {
     { enabled: !!selectedSubject }
   );
 
+  const { data: activeTest } = trpc.tests.getById.useQuery(
+    { testId: activeTestId! },
+    { enabled: !!activeTestId }
+  );
+
   const { data: attempts } = trpc.tests.getAttempts.useQuery({});
 
   const startAttemptMutation = trpc.tests.startAttempt.useMutation({
     onSuccess: (data) => {
       setAttemptId(data.id);
+      setCurrentQuestionIndex(0);
+      setAnswers({});
       toast.success('Test started!');
     },
   });
@@ -51,19 +60,15 @@ export default function Tests() {
     onSuccess: (data) => {
       setTestResults(data);
       setShowResults(true);
-      setActiveTest(null);
+      setActiveTestId(null);
+      setAttemptId(null);
       toast.success('Test submitted successfully!');
     },
   });
 
-  const handleStartTest = async (test: any) => {
-    const { data: testData } = await trpc.tests.getById.useQuery({ testId: test.id });
-    if (testData) {
-      setActiveTest(testData);
-      setCurrentQuestionIndex(0);
-      setAnswers({});
-      startAttemptMutation.mutate({ testId: test.id });
-    }
+  const handleStartTest = (testId: number) => {
+    setActiveTestId(testId);
+    startAttemptMutation.mutate({ testId });
   };
 
   const handleAnswerSelect = (questionId: number, answer: string) => {
@@ -74,13 +79,13 @@ export default function Tests() {
         attemptId,
         questionId,
         answer,
-        timeSpent: 60, // Track actual time in production
+        timeSpent: 60,
       });
     }
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < (activeTest?.questions?.length || 0) - 1) {
+    if (activeTest && currentQuestionIndex < (activeTest.questions?.length || 0) - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     }
   };
@@ -123,61 +128,73 @@ export default function Tests() {
                 <CardDescription>Choose a subject to view available tests</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {subjects?.map((subject) => (
-                    <Button
-                      key={subject.id}
-                      variant={selectedSubject === subject.id ? 'default' : 'outline'}
-                      className="h-auto py-4 flex flex-col items-center gap-2"
-                      onClick={() => setSelectedSubject(subject.id)}
-                    >
-                      <BookOpen className="h-6 w-6" />
-                      <span className="text-sm font-medium">{subject.name}</span>
-                    </Button>
-                  ))}
-                </div>
+                {subjects && subjects.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {subjects.map((subject) => (
+                      <Button
+                        key={subject.id}
+                        variant={selectedSubject === subject.id ? 'default' : 'outline'}
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setSelectedSubject(subject.id)}
+                      >
+                        <BookOpen className="h-6 w-6" />
+                        <span className="text-sm font-medium">{subject.name}</span>
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                    <p className="text-muted-foreground mb-4">
+                      No subjects available yet. Sample data will be added soon.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      The system is fully functional - subjects and tests can be added via the admin panel.
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             {/* Available Tests */}
-            {selectedSubject && (
+            {selectedSubject && tests && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {tests?.map((test) => (
-                  <Card key={test.id} className="card-hover">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <FileText className="h-5 w-5" />
-                        {test.name}
-                      </CardTitle>
-                      <CardDescription>{test.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Type</span>
-                          <span className="font-medium">{test.type}</span>
+                {tests.length > 0 ? (
+                  tests.map((test) => (
+                    <Card key={test.id} className="card-hover">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          {test.name}
+                        </CardTitle>
+                        <CardDescription>{test.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Type</span>
+                            <span className="font-medium">{test.type}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Duration</span>
+                            <span className="font-medium">{test.durationMinutes} min</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Total Marks</span>
+                            <span className="font-medium">{test.totalMarks}</span>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Duration</span>
-                          <span className="font-medium">{test.durationMinutes} min</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Total Marks</span>
-                          <span className="font-medium">{test.totalMarks}</span>
-                        </div>
-                      </div>
-                      <Button 
-                        className="w-full" 
-                        onClick={() => handleStartTest(test)}
-                      >
-                        <Play className="mr-2 h-4 w-4" />
-                        Start Test
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-                
-                {tests?.length === 0 && (
+                        <Button 
+                          className="w-full" 
+                          onClick={() => handleStartTest(test.id)}
+                        >
+                          <Play className="mr-2 h-4 w-4" />
+                          Start Test
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
                   <div className="col-span-full text-center py-12">
                     <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
                     <p className="text-muted-foreground">
@@ -249,7 +266,10 @@ export default function Tests() {
         </Tabs>
 
         {/* Test Taking Dialog */}
-        <Dialog open={!!activeTest} onOpenChange={() => setActiveTest(null)}>
+        <Dialog open={!!activeTestId && !!attemptId} onOpenChange={() => {
+          setActiveTestId(null);
+          setAttemptId(null);
+        }}>
           <DialogContent className="max-w-4xl max-h-[90vh]">
             <DialogHeader>
               <DialogTitle>{activeTest?.test?.name}</DialogTitle>
@@ -274,26 +294,38 @@ export default function Tests() {
                       {currentQuestion.question?.questionText}
                     </h3>
 
-                    {currentQuestion.question?.type === 'mcq' && (
-                      <div className="space-y-2">
-                        {currentQuestion.question?.options?.map((option: any, idx: number) => (
-                          <Button
-                            key={idx}
-                            variant={answers[currentQuestion.questionId] === option.text ? 'default' : 'outline'}
-                            className="w-full justify-start text-left h-auto py-3"
-                            onClick={() => handleAnswerSelect(currentQuestion.questionId, option.text)}
-                          >
-                            <span className="mr-2 font-bold">{String.fromCharCode(65 + idx)}.</span>
-                            {option.text}
-                          </Button>
-                        ))}
-                      </div>
+                    {currentQuestion.question?.type === 'mcq' && currentQuestion.question?.options && (
+                      <RadioGroup
+                        value={answers[currentQuestion.questionId] || ''}
+                        onValueChange={(value) => handleAnswerSelect(currentQuestion.questionId, value)}
+                      >
+                        <div className="space-y-2">
+                          {currentQuestion.question.options.map((option: any, idx: number) => (
+                            <div key={idx} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50">
+                              <RadioGroupItem value={option.text} id={`option-${idx}`} />
+                              <label htmlFor={`option-${idx}`} className="flex-1 cursor-pointer">
+                                <span className="mr-2 font-bold">{String.fromCharCode(65 + idx)}.</span>
+                                {option.text}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </RadioGroup>
+                    )}
+
+                    {currentQuestion.question?.type === 'numeric' && (
+                      <Input
+                        type="number"
+                        placeholder="Enter your answer..."
+                        value={answers[currentQuestion.questionId] || ''}
+                        onChange={(e) => handleAnswerSelect(currentQuestion.questionId, e.target.value)}
+                      />
                     )}
 
                     {(currentQuestion.question?.type === 'short_answer' || 
                       currentQuestion.question?.type === 'long_answer') && (
-                      <textarea
-                        className="w-full min-h-[150px] p-3 border rounded-lg"
+                      <Textarea
+                        className="min-h-[150px]"
                         placeholder="Type your answer here..."
                         value={answers[currentQuestion.questionId] || ''}
                         onChange={(e) => handleAnswerSelect(currentQuestion.questionId, e.target.value)}
@@ -315,9 +347,9 @@ export default function Tests() {
 
               <div className="flex gap-2">
                 {currentQuestionIndex === (activeTest?.questions?.length || 0) - 1 ? (
-                  <Button onClick={handleSubmitTest}>
+                  <Button onClick={handleSubmitTest} disabled={submitTestMutation.isPending}>
                     <CheckCircle2 className="mr-2 h-4 w-4" />
-                    Submit Test
+                    {submitTestMutation.isPending ? 'Submitting...' : 'Submit Test'}
                   </Button>
                 ) : (
                   <Button onClick={handleNextQuestion}>

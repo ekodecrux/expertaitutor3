@@ -7,8 +7,10 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   Award,
+  BarChart3,
   Bell,
   BookOpen,
+  Bot,
   Calendar,
   FileText,
   GraduationCap,
@@ -19,6 +21,7 @@ import {
   Menu,
   MessageSquare,
   Sparkles,
+  Users,
   Video,
   X,
 } from "lucide-react";
@@ -82,7 +85,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
       title: "AI TOOLS",
       items: [
         { label: "AI Tutor", icon: Sparkles, path: "/ai-tutor" },
+        { label: "AI Tutor (Avatar)", icon: Bot, path: "/ai-tutor-avatar" },
         { label: "Chat Tutor", icon: MessageSquare, path: "/chat-tutor" },
+        { label: "Lesson Narration", icon: BookOpen, path: "/lesson-narration" },
       ],
     },
     {
@@ -90,6 +95,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
       items: [
         { label: "Rewards", icon: Award, path: "/rewards" },
         { label: "Progress", icon: LineChart, path: "/progress" },
+        { label: "Assessment Analysis", icon: BarChart3, path: "/assessment-analysis" },
+        { label: "Parent-Teacher Meeting", icon: Users, path: "/parent-teacher-meeting" },
         { label: "Support", icon: HelpCircle, path: "/support" },
       ],
     },

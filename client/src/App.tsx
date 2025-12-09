@@ -19,6 +19,10 @@ import Support from "./pages/Support";
 import Profile from "./pages/Profile";
 import Doubts from "./pages/Doubts";
 import Tests from "./pages/Tests";
+import AITutorWithAvatar from "./pages/AITutorWithAvatar";
+import LessonNarration from "./pages/LessonNarration";
+import AssessmentAnalysis from "./pages/AssessmentAnalysis";
+import ParentTeacherMeeting from "./pages/ParentTeacherMeeting";
 
 function Router() {
   return (
@@ -101,6 +105,30 @@ function Router() {
       <Route path={"/tests"}>
         <AppLayout>
           <Tests />
+        </AppLayout>
+      </Route>
+      
+      <Route path={"/ai-tutor-avatar"}>
+        <AppLayout>
+          <AITutorWithAvatar />
+        </AppLayout>
+      </Route>
+      
+      <Route path={"/lesson-narration"}>
+        <AppLayout>
+          <LessonNarration />
+        </AppLayout>
+      </Route>
+      
+      <Route path={"/assessment-analysis"}>
+        <AppLayout>
+          <AssessmentAnalysis />
+        </AppLayout>
+      </Route>
+      
+      <Route path={"/parent-teacher-meeting"}>
+        <AppLayout>
+          <ParentTeacherMeeting />
         </AppLayout>
       </Route>
       

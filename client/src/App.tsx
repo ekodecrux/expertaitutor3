@@ -33,6 +33,7 @@ import SubscriptionManagement from "./pages/SubscriptionManagement";
 import PaymentHistory from "./pages/PaymentHistory";
 import ContentLibrary from "./pages/ContentLibrary";
 import Favorites from "./pages/Favorites";
+import Recommendations from "./pages/Recommendations";
 import { useAuth } from "./_core/hooks/useAuth";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
@@ -213,6 +214,13 @@ function Router() {
       <Route path="/favorites">
         <ProtectedRoute>
           <Favorites />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Recommendations Route */}
+      <Route path="/recommendations">
+        <ProtectedRoute>
+          <Recommendations />
         </ProtectedRoute>
       </Route>
       

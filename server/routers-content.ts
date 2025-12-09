@@ -104,6 +104,80 @@ export const contentRouter = router({
       return result?.count || 0;
     }),
 
+  getRecommendations: protectedProcedure
+    .input(z.object({ limit: z.number().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      // Get user's favorited content
+      const favorites = await db.select()
+        .from(contentFavorites)
+        .where(eq(contentFavorites.userId, ctx.user.id))
+        .limit(50);
+
+      if (favorites.length === 0) {
+        // No favorites yet, return popular content
+        return await db.select()
+          .from(contentItems)
+          .where(eq(contentItems.status, "live"))
+          .orderBy(desc(contentItems.createdAt))
+          .limit(input?.limit || 10);
+      }
+
+      // Get details of favorited content
+      const favoritedIds = favorites.map(f => f.contentId);
+      const favoritedContent = await db.select()
+        .from(contentItems)
+        .where(inArray(contentItems.id, favoritedIds));
+
+      // Extract common attributes from favorites
+      const topicIds = Array.from(new Set(favoritedContent.map(c => c.topicId)));
+      const difficulties = Array.from(new Set(favoritedContent.map(c => c.difficulty).filter(Boolean)));
+      const types = Array.from(new Set(favoritedContent.map(c => c.type)));
+
+      // Find similar content (same topics, similar difficulty, not already favorited)
+      const recommendations = await db.select()
+        .from(contentItems)
+        .where(and(
+          eq(contentItems.status, "live"),
+          sql`${contentItems.id} NOT IN (${favoritedIds.join(',')})`
+        ))
+        .limit(100);
+
+      // Score and rank recommendations
+      const scored = recommendations.map(item => {
+        let score = 0;
+        
+        // Topic match (highest weight)
+        if (topicIds.includes(item.topicId)) score += 10;
+        
+        // Difficulty match
+        if (item.difficulty && difficulties.includes(item.difficulty)) score += 5;
+        
+        // Type match
+        if (types.includes(item.type)) score += 3;
+        
+        // Exam tags overlap
+        if (item.examTags && Array.isArray(item.examTags)) {
+          const favoritedExamTags = favoritedContent
+            .flatMap(c => (c.examTags as string[]) || [])
+            .filter(Boolean);
+          const overlap = (item.examTags as string[]).filter(tag => 
+            favoritedExamTags.includes(tag)
+          ).length;
+          score += overlap * 2;
+        }
+
+        return { ...item, score };
+      });
+
+      // Sort by score and return top recommendations
+      return scored
+        .sort((a, b) => b.score - a.score)
+        .slice(0, input?.limit || 10);
+    }),
+
 
   // ============= CONTENT SOURCES MANAGEMENT =============
   

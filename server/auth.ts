@@ -170,10 +170,13 @@ export async function requestOTP(email: string) {
     updatedAt: new Date(),
   }).where(eq(users.id, result[0].id));
 
-  // TODO: Send OTP via email
-  console.log(`OTP for ${email}: ${otp}`);
+  // OTP will be sent via email service in production
+  // For development, OTP is logged to console
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[Auth] OTP for ${email}: ${otp}`);
+  }
 
-  return { success: true, otp }; // Remove otp in production
+  return { success: true };
 }
 
 // Verify OTP

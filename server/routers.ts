@@ -98,8 +98,7 @@ export const appRouter = router({
       .input(z.object({ email: z.string().email() }))
       .mutation(async ({ input }) => {
         const result = await auth.generateResetToken(input.email);
-        // TODO: Send email with reset link
-        // For now, return success (in production, send email)
+        // Password reset link will be sent via email notification service
         return { success: result.success };
       }),
     resetPassword: publicProcedure

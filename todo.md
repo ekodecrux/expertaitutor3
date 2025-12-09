@@ -721,3 +721,19 @@
 - [ ] Test email sending
 - [ ] Test SMS sending
 - [ ] Update auth functions to use email/SMS services
+
+
+## Phase 53: Production Credentials Fix (IN PROGRESS)
+- [x] Create test users in dev database
+- [x] Verify dev credentials work
+- [ ] Access published site database and create users
+- [ ] Test login on published URL: https://aitutorapp-5l3gkwsw.manus.space
+- [ ] Verify all 5 test accounts work (superadmin, admin, teacher, student, parent)
+- [ ] Provide working credentials to user
+
+## Phase 54: Mobile OTP SMS Delivery Fix (TODO)
+- [ ] Update OTP system to detect mobile vs email input
+- [ ] Implement SMS sending via Twilio or built-in SMS service
+- [ ] Remove email sending for mobile OTP requests
+- [ ] Add proper error handling for SMS delivery failures
+- [ ] Test mobile OTP flow end-to-end on published site

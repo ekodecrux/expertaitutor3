@@ -8,6 +8,7 @@ import { invokeLLM } from "./_core/llm";
 import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
 import * as db from "./db";
+import * as auth from "./auth";
 
 // ============= RBAC MIDDLEWARE =============
 
@@ -51,6 +52,45 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
+    register: publicProcedure
+      .input(z.object({
+        name: z.string(),
+        email: z.string().email(),
+        password: z.string(),
+        role: z.enum(["student", "teacher", "parent"]).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await auth.registerUser(input);
+      }),
+    login: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        password: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await auth.loginUser(input.email, input.password);
+        // Set session cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, result.token, cookieOptions);
+        return result;
+      }),
+    requestOTP: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        return await auth.requestOTP(input.email);
+      }),
+    verifyOTP: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        otp: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await auth.verifyOTP(input.email, input.otp);
+        // Set session cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, result.token, cookieOptions);
+        return result;
+      }),
   }),
 
   // ============= STUDENT PROFILE =============

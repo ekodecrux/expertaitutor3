@@ -15,6 +15,13 @@
       "when": 1765276934699,
       "tag": "0001_hot_newton_destine",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1765281239486,
+      "tag": "0002_daffy_spitfire",
+      "breakpoints": true
     }
   ]
 }

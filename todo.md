@@ -246,3 +246,80 @@
 - [ ] Create teacher assignment interface
 - [ ] Build student roster views
 - [ ] Add class schedule management
+
+
+## Phase 23: Subscription Management System
+- [ ] Create subscription plans table (Free, Basic, Premium, Enterprise)
+- [ ] Build plan features configuration (max users, storage, AI credits)
+- [ ] Add pricing tiers with regional pricing support
+- [ ] Implement trial periods and grace periods
+- [ ] Create Super Admin plan management interface
+- [ ] Build plan comparison page for customers
+- [ ] Add subscription assignment to organizations
+- [ ] Implement usage tracking and limits enforcement
+
+## Phase 24: Payment Gateway Integration
+- [ ] Integrate Stripe payment gateway
+- [ ] Add Razorpay for Indian market
+- [ ] Build subscription billing automation
+- [ ] Create invoice generation system
+- [ ] Add payment history tracking
+- [ ] Implement webhook handlers for payment events
+- [ ] Build refund and cancellation workflows
+- [ ] Add payment method management
+
+## Phase 25: Communication Integrations
+- [ ] Create integration settings table in database
+- [ ] Build SMS gateway integration (Twilio/AWS SNS)
+- [ ] Add WhatsApp Business API integration
+- [ ] Implement email service (SendGrid/AWS SES)
+- [ ] Create API key management interface
+- [ ] Build test connection features
+- [ ] Add notification templates management
+- [ ] Implement usage analytics for communications
+
+## Phase 26: Video Conferencing Integration
+- [ ] Integrate Google Meet API
+- [ ] Add Zoom API integration
+- [ ] Build meeting scheduling interface
+- [ ] Create meeting room management
+- [ ] Add calendar integration
+- [ ] Implement meeting recordings storage
+- [ ] Build attendance tracking
+- [ ] Add meeting analytics
+
+## Phase 27: Super Admin & Admin Settings
+- [ ] Create Super Admin dashboard
+- [ ] Build organization onboarding workflow
+- [ ] Add API keys management panel
+- [ ] Create integration configuration interface
+- [ ] Implement system-wide settings
+- [ ] Build usage analytics dashboard
+- [ ] Add audit logs viewer
+- [ ] Create backup and restore features
+
+
+## Payment Access Control Rules
+- Super Admin: Manages all institute subscriptions and billing
+- Institute Admin: Pays for institute subscription
+- Parent: Pays for individual student subscriptions/courses
+- Student/Teacher: No payment access (view-only for their usage)
+
+
+## Phase 28: Brain Training Games (Icebreaker Sessions)
+- [ ] Research and select open-source brain game libraries
+- [ ] Create games database table
+- [ ] Integrate memory games (pattern matching, card flip)
+- [ ] Add logic puzzles (Sudoku, chess puzzles)
+- [ ] Implement math challenges (quick arithmetic)
+- [ ] Add word games (vocabulary, spelling)
+- [ ] Integrate spatial reasoning games (Tetris-style)
+- [ ] Build focus games (spot the difference)
+- [ ] Create games menu in AI Tutor section
+- [ ] Implement time-boxed sessions (5-10 min)
+- [ ] Add difficulty adaptation based on student level
+- [ ] Integrate with points and rewards system
+- [ ] Build cognitive skills progress tracking
+- [ ] Create games leaderboard
+- [ ] Add AI recommendations for game selection
+- [ ] Track energy/fatigue levels for recommendations

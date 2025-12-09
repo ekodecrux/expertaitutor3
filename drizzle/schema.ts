@@ -10,13 +10,32 @@ export const users = mysqlTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["student", "parent", "teacher", "admin", "institution_admin"]).default("student").notNull(),
+  role: mysqlEnum("role", ["student", "parent", "teacher", "admin", "institution_admin", "branch_admin", "super_admin"]).default("student").notNull(),
   institutionId: int("institutionId"),
+  organizationId: int("organizationId"),
+  branchId: int("branchId"),
+  // Authentication fields
+  passwordHash: varchar("passwordHash", { length: 255 }),
+  emailVerified: boolean("emailVerified").default(false),
+  otpCode: varchar("otpCode", { length: 6 }),
+  otpExpiry: timestamp("otpExpiry"),
+  resetToken: varchar("resetToken", { length: 255 }),
+  resetTokenExpiry: timestamp("resetTokenExpiry"),
+  failedLoginAttempts: int("failedLoginAttempts").default(0),
+  lockedUntil: timestamp("lockedUntil"),
+  googleId: varchar("googleId", { length: 255 }),
+  facebookId: varchar("facebookId", { length: 255 }),
+  gdprConsent: boolean("gdprConsent").default(false),
+  gdprConsentDate: timestamp("gdprConsentDate"),
+  dataResidency: varchar("dataResidency", { length: 50 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 }, (table) => ({
   institutionIdx: index("institution_idx").on(table.institutionId),
+  organizationIdx: index("organization_idx").on(table.organizationId),
+  branchIdx: index("branch_idx").on(table.branchId),
+  emailIdx: index("email_idx").on(table.email),
 }));
 
 export type User = typeof users.$inferSelect;

@@ -101,11 +101,9 @@ export default function AIRoleplay() {
     if (!isRecording) {
       // Start voice recording
       setIsRecording(true);
-      console.log('Recording started');
     } else {
       // Stop recording and transcribe
       setIsRecording(false);
-      console.log('Recording stopped');
     }
   };
 

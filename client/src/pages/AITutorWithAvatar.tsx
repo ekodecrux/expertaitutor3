@@ -101,7 +101,6 @@ export default function AITutorWithAvatar() {
 
   const handleSpeak = (text: string) => {
     // In production, this would use Web Speech API or external TTS service
-    console.log("Speaking:", text);
     // Simulated female, slow English voice as per user preference
   };
 

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { trpc } from '@/lib/trpc';
 import { MessageCircle, X, Mic, MicOff, Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -97,6 +98,8 @@ export default function NavigationAssistant() {
     setIsRecording(false);
   };
 
+  const chatMutation = trpc.navigationAssistant.chat.useMutation();
+
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
 
@@ -107,17 +110,36 @@ export default function NavigationAssistant() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputMessage;
     setInputMessage('');
 
-    // Simulate AI response (replace with actual tRPC call)
-    setTimeout(() => {
+    try {
+      const conversationHistory = messages.map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const response = await chatMutation.mutateAsync({
+        message: currentInput,
+        persona,
+        conversationHistory
+      });
+
       const aiResponse: Message = {
         role: 'assistant',
-        content: getAIResponse(inputMessage, persona),
+        content: typeof response.content === 'string' ? response.content : JSON.stringify(response.content),
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiResponse]);
-    }, 500);
+    } catch (error) {
+      console.error('Navigation assistant error:', error);
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: "I'm having trouble connecting right now. Please try again.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
   };
 
   const getAIResponse = (query: string, userPersona: string): string => {

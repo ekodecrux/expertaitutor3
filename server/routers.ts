@@ -16,6 +16,7 @@ import { teacherRouter } from "./routers-teacher";
 import { parentRouter } from "./routers-parent";
 import { superAdminRouter } from "./routers-superadmin";
 import { messagingRouter } from "./routers-messaging";
+import { navigationAssistantRouter } from "./routers/navigationAssistant.js";
 // import { gamificationRouter } from "./routers/gamification.js";
 // import { spacedRepetitionRouter } from "./routers/spacedRepetition";
 
@@ -81,9 +82,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         try {
-          console.log('[Router] Registration request:', { email: input.email, role: input.role });
           const result = await auth.registerUser(input);
-          console.log('[Router] Registration successful');
           // Set session cookie
           const cookieOptions = getSessionCookieOptions(ctx.req);
           ctx.res.cookie(COOKIE_NAME, result.token, cookieOptions);
@@ -703,6 +702,7 @@ Provide a week-by-week breakdown with topics to cover.`,
   // ============= SUPER ADMIN MANAGEMENT =============
   superadmin: superAdminRouter,
    messaging: messagingRouter,
+  navigationAssistant: navigationAssistantRouter,
   
   // ============= GAMIFICATION =============
   // gamification: gamificationRouter,

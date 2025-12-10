@@ -2080,3 +2080,15 @@
 - [x] Write comprehensive vitest tests (14/14 passing)
 - [x] Add navigation integration in sidebar
 - [x] Compile TypeScript schema to JavaScript
+
+
+## Phase 39: Concept Extraction Enhancements
+- [x] Implement PDF upload with text extraction
+- [x] Implement image upload with OCR (Tesseract.js)
+- [x] Add file type validation and size limits
+- [x] Update frontend UI with file upload dropzone
+- [ ] Create interactive concept map visualization with D3.js/React Flow
+- [ ] Implement concept relationship graph rendering
+- [ ] Add zoom, pan, and node interaction to concept map
+- [ ] Build spaced repetition flashcard system
+- [ ] Implement SM-2 algorithm for review scheduling

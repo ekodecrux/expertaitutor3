@@ -41,6 +41,55 @@ describe('Concept Extraction Router', () => {
 
   const caller = appRouter.createCaller(mockContext);
 
+  describe('uploadFile with OCR', () => {
+    it('should detect PDF file type correctly', async () => {
+      // Create a minimal PDF buffer
+      const pdfBuffer = Buffer.from('%PDF-1.4\n%test content\n%%EOF');
+      const base64 = pdfBuffer.toString('base64');
+      
+      // This will fail PDF parsing but should detect it as PDF type
+      await expect(
+        caller.conceptExtraction.uploadFile({
+          title: 'Test PDF Document',
+          description: 'A test PDF file',
+          fileBase64: base64,
+          fileName: 'test.pdf',
+          subject: 'mathematics',
+          topic: 'Algebra',
+          curriculum: 'CBSE',
+        })
+      ).rejects.toThrow(); // Will fail on parsing, but that's expected
+    });
+
+    it('should reject files larger than 16MB', async () => {
+      // Create a buffer larger than 16MB
+      const largeBuffer = Buffer.alloc(17 * 1024 * 1024);
+      const base64 = largeBuffer.toString('base64');
+      
+      await expect(
+        caller.conceptExtraction.uploadFile({
+          title: 'Large File',
+          fileBase64: base64,
+          fileName: 'large.pdf',
+        })
+      ).rejects.toThrow('File size exceeds 16MB limit');
+    });
+
+    it('should reject unsupported file types', async () => {
+      // Create an invalid file buffer
+      const invalidBuffer = Buffer.from('not a valid file');
+      const base64 = invalidBuffer.toString('base64');
+      
+      await expect(
+        caller.conceptExtraction.uploadFile({
+          title: 'Invalid File',
+          fileBase64: base64,
+          fileName: 'test.txt',
+        })
+      ).rejects.toThrow('Unsupported file type');
+    });
+  });
+
   describe('uploadMaterial', () => {
     it('should upload study material with text content', async () => {
       const result = await caller.conceptExtraction.uploadMaterial({

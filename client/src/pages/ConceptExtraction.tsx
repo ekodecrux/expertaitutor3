@@ -35,6 +35,8 @@ export default function ConceptExtraction() {
   const [topic, setTopic] = useState("");
   const [curriculum, setCurriculum] = useState("");
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
 
   const utils = trpc.useUtils();
 
@@ -85,6 +87,27 @@ export default function ConceptExtraction() {
     },
     onError: (error) => {
       toast.error(`Delete failed: ${error.message}`);
+    },
+  });
+
+  const uploadFileMutation = trpc.conceptExtraction.uploadFile.useMutation({
+    onSuccess: (data) => {
+      toast.success("File uploaded and text extracted successfully!");
+      setIsProcessingFile(false);
+      // Automatically start extraction
+      extractMutation.mutate({ materialId: data.materialId });
+      // Clear form
+      setTitle("");
+      setDescription("");
+      setSelectedFile(null);
+      setSubject("");
+      setTopic("");
+      setCurriculum("");
+      utils.conceptExtraction.getMaterials.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Upload failed: ${error.message}`);
+      setIsProcessingFile(false);
     },
   });
 
@@ -269,6 +292,89 @@ export default function ConceptExtraction() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                 />
+              </div>
+
+              <Separator />
+
+              {/* File Upload Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Label>Upload PDF or Image</Label>
+                  <Badge variant="outline" className="text-xs">OCR Enabled</Badge>
+                </div>
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.webp"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      
+                      // Validate file size (16MB)
+                      if (file.size > 16 * 1024 * 1024) {
+                        toast.error("File size exceeds 16MB limit");
+                        return;
+                      }
+                      
+                      setSelectedFile(file);
+                      setIsProcessingFile(true);
+                      
+                      // Convert to base64
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const base64 = reader.result as string;
+                        const base64Data = base64.split(',')[1]; // Remove data:image/png;base64, prefix
+                        
+                        uploadFileMutation.mutate({
+                          title: title || file.name.replace(/\.[^/.]+$/, ""),
+                          description,
+                          fileBase64: base64Data,
+                          fileName: file.name,
+                          subject,
+                          topic,
+                          curriculum,
+                        });
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="hidden"
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    {selectedFile ? (
+                      <div className="space-y-2">
+                        <FileText className="h-12 w-12 mx-auto text-primary" />
+                        <p className="font-medium">{selectedFile.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                        {isProcessingFile && (
+                          <div className="flex items-center justify-center gap-2 text-sm text-blue-600">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Extracting text...
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
+                        <p className="font-medium">Click to upload PDF or Image</p>
+                        <p className="text-xs text-muted-foreground">
+                          Supports PDF, PNG, JPG, GIF, BMP, WebP (Max 16MB)
+                        </p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or paste text</span>
+                </div>
               </div>
 
               <div className="space-y-2">

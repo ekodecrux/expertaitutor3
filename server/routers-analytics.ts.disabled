@@ -169,7 +169,7 @@ Return your analysis as a JSON object with this structure:
       });
       
       const predictions = await db.query.progressPredictions.findMany({
-        where: (preds, { eq, and }) => 
+        where: (preds: any, { eq, and }: any) => 
           and(
             eq(preds.studentId, input.studentId),
             eq(preds.predictionType, 'at_risk')
@@ -274,8 +274,9 @@ Return your courses as a JSON object:
       
       // Save bridge courses to database
       const { bridgeCourses } = await import("../drizzle/schema");
+      const dbInstance = await getDb();
       for (const course of result.courses) {
-        await db.insert(bridgeCourses).values({
+        await dbInstance.insert(bridgeCourses).values({
           studentId: input.studentId,
           title: course.title,
           description: course.description,

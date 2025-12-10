@@ -202,32 +202,9 @@ export const superAdminNavigation: NavSection[] = [
     title: "PLATFORM MANAGEMENT",
     items: [
       { label: "Organizations", icon: Building2, path: "/superadmin/organizations" },
-      { label: "All Users", icon: Users, path: "/superadmin/users" },
       { label: "Subscriptions", icon: Wallet, path: "/superadmin/subscriptions" },
-    ],
-  },
-  {
-    title: "USER MANAGEMENT",
-    items: [
-      { label: "Students", icon: GraduationCap, path: "/admin/students" },
-      { label: "Teachers", icon: Users, path: "/admin/teachers" },
-      { label: "Parents", icon: Users, path: "/admin/parents" },
-      { label: "Classes & Sections", icon: School, path: "/admin/classes" },
-    ],
-  },
-  {
-    title: "CONTENT",
-    items: [
-      { label: "Content Approval", icon: CheckSquare, path: "/admin/content-approval" },
-      { label: "Content Sources", icon: BookOpen, path: "/admin/content-sources" },
-    ],
-  },
-  {
-    title: "ANALYTICS",
-    items: [
       { label: "Platform Analytics", icon: TrendingUp, path: "/superadmin/analytics" },
       { label: "Revenue Reports", icon: DollarSign, path: "/superadmin/revenue" },
-      { label: "Institution Reports", icon: BarChart3, path: "/admin/reports" },
     ],
   },
   {
@@ -238,7 +215,6 @@ export const superAdminNavigation: NavSection[] = [
     ],
   },
 ];
-
 export function getNavigationForRole(role: string): NavSection[] {
   switch (role) {
     case "student":

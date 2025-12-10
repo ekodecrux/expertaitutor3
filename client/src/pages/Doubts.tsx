@@ -235,7 +235,7 @@ export default function Doubts() {
             <DialogHeader>
               <DialogTitle>Question & Solution</DialogTitle>
               <DialogDescription>
-                AI-generated step-by-step solution
+                Detailed step-by-step solution
               </DialogDescription>
             </DialogHeader>
 

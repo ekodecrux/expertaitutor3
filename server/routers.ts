@@ -15,9 +15,7 @@ import { stripeRouter } from "./routers-stripe";
 import { teacherRouter } from "./routers-teacher";
 import { parentRouter } from "./routers-parent";
 import { superAdminRouter } from "./routers-superadmin";
-import { messagingRouter } from "./routers-messaging";
-// import { gamificationRouter } from "./routers/gamification";
-// import { spacedRepetitionRouter } from "./routers/spacedRepetition";
+import { messagingRouter } from "./routers-messaging";// import { gamificationRouter } from "./routers/gamification.js";/ import { spacedRepetitionRouter } from "./routers/spacedRepetition";
 
 // ============= RBAC MIDDLEWARE =============
 

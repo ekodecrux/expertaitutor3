@@ -1,140 +1,175 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { School, Users, ClipboardList, CheckSquare, TrendingUp, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import {
+  Users,
+  BookOpen,
+  ClipboardCheck,
+  TrendingUp,
+  Calendar,
+  MessageSquare,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 export default function TeacherDashboard() {
-  const stats = [
-    {
-      title: "My Classes",
-      value: "4",
-      change: "2 sections each",
-      icon: School,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      title: "Total Students",
-      value: "156",
-      change: "Across all classes",
-      icon: Users,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      title: "Pending Assignments",
-      value: "12",
-      change: "To be graded",
-      icon: ClipboardList,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-    },
-    {
-      title: "Attendance Rate",
-      value: "94%",
-      change: "This month",
-      icon: CheckSquare,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
+  const attendanceData = [
+    { week: "Week 1", attendance: 92 },
+    { week: "Week 2", attendance: 95 },
+    { week: "Week 3", attendance: 93 },
+    { week: "Week 4", attendance: 94 },
   ];
 
-  const myClasses = [
-    { name: "Class 10-A", subject: "Mathematics", students: 42, nextClass: "Today, 10:00 AM" },
-    { name: "Class 10-B", subject: "Mathematics", students: 38, nextClass: "Today, 2:00 PM" },
-    { name: "Class 9-A", subject: "Mathematics", students: 45, nextClass: "Tomorrow, 9:00 AM" },
-    { name: "Class 9-B", subject: "Mathematics", students: 31, nextClass: "Tomorrow, 11:00 AM" },
-  ];
-
-  const recentSubmissions = [
-    { student: "Rahul Sharma", assignment: "Algebra Quiz", score: "85%", time: "2 hours ago" },
-    { student: "Priya Patel", assignment: "Geometry Test", score: "92%", time: "4 hours ago" },
-    { student: "Amit Kumar", assignment: "Trigonometry HW", score: "78%", time: "1 day ago" },
+  const classPerformanceData = [
+    { class: "Class 10A", avgScore: 85 },
+    { class: "Class 10B", avgScore: 82 },
+    { class: "Class 11A", avgScore: 88 },
+    { class: "Class 11B", avgScore: 80 },
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Teacher Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your classes and track student progress
-          </p>
-        </div>
-        <Link href="/teacher/assignments">
-          <Button>Create Assignment</Button>
-        </Link>
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Teacher Dashboard
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">
+          Manage your classes and track student progress
+        </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">My Classes</CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">4</div>
+            <p className="text-xs text-muted-foreground">
+              2 morning, 2 afternoon
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">156</div>
+            <p className="text-xs text-muted-foreground">
+              Across all classes
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Assignments</CardTitle>
+            <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">12</div>
+            <p className="text-xs text-muted-foreground">
+              To be graded
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Attendance</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">94%</div>
+            <p className="text-xs text-muted-foreground">
+              <span className="text-green-600">+2%</span> from last month
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* My Classes */}
-      <Card>
-        <CardHeader>
-          <CardTitle>My Classes</CardTitle>
-          <CardDescription>Your assigned classes and schedules</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {myClasses.map((cls) => (
-              <div key={cls.name} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                    <School className="h-6 w-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">{cls.name} - {cls.subject}</p>
-                    <p className="text-sm text-muted-foreground">{cls.students} students</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium">Next Class</p>
-                  <p className="text-sm text-muted-foreground">{cls.nextClass}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Submissions and Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Recent Submissions</CardTitle>
-            <CardDescription>Latest student work to review</CardDescription>
+            <CardTitle>Attendance Trends</CardTitle>
+            <CardDescription>Weekly attendance across all classes</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={attendanceData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="week" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="attendance" stroke="#6366f1" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Class Performance</CardTitle>
+            <CardDescription>Average scores by class</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={classPerformanceData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="class" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="avgScore" fill="#10b981" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>My Classes</CardTitle>
+            <CardDescription>Your assigned classes and schedules</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentSubmissions.map((submission, index) => (
-                <div key={index} className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-indigo-600 mt-2" />
+              {[
+                { name: "Class 10A - Mathematics", students: 40, time: "Mon, Wed, Fri 9:00 AM" },
+                { name: "Class 10B - Mathematics", students: 38, time: "Mon, Wed, Fri 11:00 AM" },
+                { name: "Class 11A - Mathematics", students: 42, time: "Tue, Thu 9:00 AM" },
+                { name: "Class 11B - Mathematics", students: 36, time: "Tue, Thu 11:00 AM" },
+              ].map((cls, i) => (
+                <div key={i} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+                      <BookOpen className="h-6 w-6 text-indigo-600 dark:text-indigo-300" />
+                    </div>
                     <div>
-                      <p className="text-sm font-medium">{submission.student}</p>
-                      <p className="text-xs text-muted-foreground">{submission.assignment}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{cls.name}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {cls.students} students • {cls.time}
+                      </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-green-600">{submission.score}</p>
-                    <p className="text-xs text-muted-foreground">{submission.time}</p>
-                  </div>
+                  <Button variant="outline" size="sm">
+                    View
+                  </Button>
                 </div>
               ))}
             </div>
@@ -143,34 +178,27 @@ export default function TeacherDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common teaching tasks</CardDescription>
+            <CardTitle>Upcoming Events</CardTitle>
+            <CardDescription>Your schedule for this week</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <Link href="/teacher/attendance">
-              <Button variant="outline" className="w-full justify-start">
-                <CheckSquare className="mr-2 h-4 w-4" />
-                Mark Attendance
-              </Button>
-            </Link>
-            <Link href="/teacher/grading">
-              <Button variant="outline" className="w-full justify-start">
-                <ClipboardList className="mr-2 h-4 w-4" />
-                Grade Assignments ({stats[2].value})
-              </Button>
-            </Link>
-            <Link href="/teacher/lesson-plans">
-              <Button variant="outline" className="w-full justify-start">
-                <Calendar className="mr-2 h-4 w-4" />
-                View Lesson Plans
-              </Button>
-            </Link>
-            <Link href="/teacher/reports">
-              <Button variant="outline" className="w-full justify-start">
-                <TrendingUp className="mr-2 h-4 w-4" />
-                Student Reports
-              </Button>
-            </Link>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { icon: Calendar, text: "Parent-Teacher Meeting - Class 10A", time: "Today, 3:00 PM" },
+                { icon: ClipboardCheck, text: "Submit Mid-term Grades", time: "Tomorrow, 5:00 PM" },
+                { icon: MessageSquare, text: "Faculty Meeting", time: "Friday, 2:00 PM" },
+              ].map((event, i) => (
+                <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                    <event.icon className="h-5 w-5 text-purple-600 dark:text-purple-300" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{event.text}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{event.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

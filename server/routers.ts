@@ -41,11 +41,22 @@ const teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== 'admin' && ctx.user.role !== 'institution_admin') {
+  // Admin and Super Admin both have admin access
+  if (ctx.user.role !== 'admin' && ctx.user.role !== 'super_admin') {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
   }
   return next({ ctx });
 });
+
+const superAdminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.user.role !== 'super_admin') {
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'Super Admin access required' });
+  }
+  return next({ ctx });
+});
+
+// Middleware that allows both admin and super_admin
+const adminOrSuperAdminProcedure = adminProcedure;
 
 // ============= ROUTERS =============
 

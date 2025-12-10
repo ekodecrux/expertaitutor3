@@ -1183,3 +1183,152 @@
 - [ ] Add message search and filtering
 - [ ] Create typing indicators
 - [ ] Add message read receipts
+
+
+## CRITICAL ISSUES TO FIX IMMEDIATELY (December 2025)
+
+### 🚨 P0 - Blocking Issues:
+- [ ] **Super Admin Dashboard Bug** - Currently showing Institute Admin dashboard instead of platform-wide analytics
+- [ ] **Double Login Bug** - Login requires entering credentials twice to succeed
+- [ ] **Navigation Scroll Issue** - Left sidebar too long, cannot reach logout button (no scroll)
+- [ ] **Placeholder Pages** - Many navigation items lead to non-functional placeholder pages
+
+### 🎯 P1 - Core Missing Features:
+- [ ] **Predictive Analytics Dashboard** - Teachers and Parents cannot see student progress vs goals
+- [ ] **Student Goal Tracking** - No visibility of where student is vs target, no bridge course recommendations
+- [ ] **Web Scraping Engine** - Content aggregation system not implemented
+- [ ] **AI Curriculum Generation** - Core engine for auto-generating lesson plans based on exam type (CBSE/GMAT) missing
+- [ ] **Adaptive Bridge Courses** - System to automatically create catch-up courses based on progress gaps not built
+
+### 📋 Detailed Fix Plan:
+
+**1. Super Admin Dashboard Fix:**
+- [ ] Create distinct SuperAdminDashboard with platform-wide metrics
+- [ ] Show all organizations, total users across orgs, revenue analytics
+- [ ] Add organization onboarding interface
+- [ ] Implement system health monitoring
+- [ ] Fix routing to use /superadmin/dashboard correctly
+
+**2. Login Bug Fix:**
+- [ ] Debug authentication flow to find double-login cause
+- [ ] Check JWT token generation and cookie setting
+- [ ] Verify session validation logic
+- [ ] Test login flow for all 5 roles
+
+**3. Navigation Scroll Fix:**
+- [ ] Make sidebar ScrollArea functional
+- [ ] Keep logout button visible (sticky bottom or scrollable)
+- [ ] Test on different screen heights
+- [ ] Add visual indicator for more items below
+
+**4. Build Functional Pages (Replace Placeholders):**
+
+**Admin Pages:**
+- [ ] /admin/students - Full CRUD with filters, search, bulk import
+- [ ] /admin/teachers - Teacher management with subject assignment
+- [ ] /admin/parents - Parent management with child linking
+- [ ] /admin/classes - Class/section management
+- [ ] /admin/reports - Comprehensive analytics and exports
+- [ ] /admin/analytics - Real-time dashboards
+- [ ] /admin/settings - Institution configuration
+
+**Teacher Pages:**
+- [ ] /teacher/classes - Class list with student rosters
+- [ ] /teacher/students - Student performance tracking
+- [ ] /teacher/attendance - Mark and track attendance
+- [ ] /teacher/lesson-plans - View and edit AI-generated plans
+- [ ] /teacher/assignments - Create and grade assignments
+- [ ] /teacher/assessments - Assessment management
+- [ ] /teacher/grading - Grading interface
+- [ ] /teacher/messages - Parent-teacher communication
+- [ ] /teacher/parent-meetings - Schedule and manage meetings
+- [ ] /teacher/reports - Generate student reports
+- [ ] **NEW: /teacher/predictive-analytics** - Student progress vs goals dashboard
+
+**Parent Pages:**
+- [ ] /parent/children - Manage multiple children
+- [ ] /parent/progress - Detailed progress tracking
+- [ ] /parent/attendance - View attendance records
+- [ ] /parent/assessments - View assessment results
+- [ ] /parent/messages - Teacher communication
+- [ ] /parent/meetings - Schedule parent-teacher meetings
+- [ ] **NEW: /parent/predictive-analytics** - Child's progress vs goals with recommendations
+
+**Student Pages:**
+- [ ] **NEW: /student/my-goals** - Personal goals and progress tracking
+- [ ] **NEW: /student/bridge-courses** - Recommended catch-up courses
+- [ ] **NEW: /student/learning-path** - AI-generated personalized path
+
+**Super Admin Pages:**
+- [ ] /superadmin/organizations - Manage all organizations
+- [ ] /superadmin/users - Platform-wide user management
+- [ ] /superadmin/subscriptions - Subscription and billing management
+- [ ] /superadmin/analytics - Platform-wide analytics
+- [ ] /superadmin/revenue - Revenue reports and forecasting
+- [ ] /superadmin/settings - System configuration
+- [ ] /superadmin/support - Support ticket management
+
+**5. Predictive Analytics System:**
+- [ ] Create student_goals table (target scores, completion dates)
+- [ ] Create progress_predictions table (AI-generated forecasts)
+- [ ] Build prediction algorithm (current pace vs target)
+- [ ] Create gap analysis engine (topics behind/ahead)
+- [ ] Build Teacher Predictive Dashboard showing:
+  * Students at risk of missing goals
+  * Recommended interventions
+  * Progress trajectory charts
+  * Topic-wise gap analysis
+- [ ] Build Parent Predictive Dashboard showing:
+  * Child's current vs target progress
+  * Estimated completion date
+  * Recommended focus areas
+  * Bridge courses needed
+
+**6. Student Goal Tracking:**
+- [ ] Create goal-setting interface for students
+- [ ] Build progress visualization (current vs target)
+- [ ] Implement milestone tracking
+- [ ] Create achievement prediction algorithm
+- [ ] Build bridge course recommendation engine
+- [ ] Show "You are X% behind/ahead" with actionable steps
+
+**7. Web Scraping Engine:**
+- [ ] Create scraped_content table (source, type, metadata)
+- [ ] Build NCERT textbook scraper
+- [ ] Create CBSE previous year papers scraper
+- [ ] Implement JEE/NEET papers scraper
+- [ ] Build content parser and categorizer
+- [ ] Create content quality validator
+- [ ] Implement automatic topic tagging
+- [ ] Build content search and retrieval API
+
+**8. AI Curriculum Generation Engine:**
+- [ ] Create curriculum_templates table (exam type, syllabus)
+- [ ] Build exam pattern analyzer
+- [ ] Implement topic sequence optimizer
+- [ ] Create difficulty progression algorithm
+- [ ] Build lesson plan generator based on:
+  * Student's exam type (CBSE Class 10, GMAT, JEE, etc.)
+  * Current knowledge level
+  * Target completion date
+  * Available study time
+- [ ] Implement automatic resource assignment
+- [ ] Build practice question selector
+- [ ] Create revision schedule generator
+
+**9. Adaptive Bridge Course System:**
+- [ ] Create bridge_courses table
+- [ ] Build gap detection algorithm (compare current vs required knowledge)
+- [ ] Implement prerequisite mapper
+- [ ] Create personalized course generator
+- [ ] Build difficulty adapter (starts easy, increases gradually)
+- [ ] Implement progress-based course updates
+- [ ] Create completion criteria and validation
+- [ ] Build success metrics tracking
+
+**10. Integration & Testing:**
+- [ ] Connect all systems (scraping → curriculum → bridge courses → analytics)
+- [ ] Test complete flow: Student enrolls → AI generates plan → Progress tracked → Gaps detected → Bridge courses created → Analytics updated
+- [ ] Verify Teacher can see and edit AI-generated plans
+- [ ] Verify Parent can see child's plan and progress
+- [ ] Test all 5 roles end-to-end

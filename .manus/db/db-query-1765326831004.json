@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, email, name, role FROM users WHERE email = 'superadmin@acesaiprofessor.com' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user UqERVjVAX9eY9W2.dc0a0a76636f --database 5L3gkWSwSgtAn7Y93vysCU --execute SELECT id, email, name, role FROM users WHERE email = 'superadmin@acesaiprofessor.com' LIMIT 5;",
+  "rows": [
+    {
+      "id": "120019",
+      "email": "superadmin@acesaiprofessor.com",
+      "name": "Super Admin",
+      "role": "super_admin"
+    },
+    {
+      "id": "210013",
+      "email": "superadmin@acesaiprofessor.com",
+      "name": "Super Admin",
+      "role": "super_admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\n120019\tsuperadmin@acesaiprofessor.com\tSuper Admin\tsuper_admin\n210013\tsuperadmin@acesaiprofessor.com\tSuper Admin\tsuper_admin\n",
+  "stderr": "",
+  "execution_time_ms": 2430
+}

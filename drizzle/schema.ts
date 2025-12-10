@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, index, uniqueIndex, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, index, uniqueIndex, json, decimal } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
 /**
@@ -859,3 +859,69 @@ export const messageReadStatus = mysqlTable("message_read_status", {
 
 export type MessageReadStatus = typeof messageReadStatus.$inferSelect;
 export type InsertMessageReadStatus = typeof messageReadStatus.$inferInsert;
+
+
+/**
+ * Student goals and targets
+ */
+export const studentGoals = mysqlTable("student_goals", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  goalType: varchar("goalType", { length: 50 }).notNull(), // 'exam_score', 'completion_date', 'topic_mastery'
+  targetValue: varchar("targetValue", { length: 255 }).notNull(), // '90%', '2025-06-30', 'algebra'
+  currentValue: varchar("currentValue", { length: 255 }),
+  deadline: timestamp("deadline"),
+  status: mysqlEnum("status", ["active", "achieved", "missed", "cancelled"]).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  studentIdx: index("student_idx").on(table.studentId),
+}));
+
+export type StudentGoal = typeof studentGoals.$inferSelect;
+export type InsertStudentGoal = typeof studentGoals.$inferInsert;
+
+/**
+ * AI-generated progress predictions
+ */
+export const progressPredictions = mysqlTable("progress_predictions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  goalId: int("goalId"),
+  predictionType: varchar("predictionType", { length: 50 }).notNull(), // 'completion_date', 'final_score', 'at_risk'
+  predictedValue: varchar("predictedValue", { length: 255 }).notNull(),
+  confidence: int("confidence"), // 0-100 confidence score
+  factors: json("factors"), // JSON array of contributing factors
+  recommendations: json("recommendations"), // JSON array of recommended actions
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+}, (table) => ({
+  studentIdx: index("student_idx").on(table.studentId),
+  goalIdx: index("goal_idx").on(table.goalId),
+}));
+
+export type ProgressPrediction = typeof progressPredictions.$inferSelect;
+export type InsertProgressPrediction = typeof progressPredictions.$inferInsert;
+
+/**
+ * Bridge courses for catching up
+ */
+export const bridgeCourses = mysqlTable("bridge_courses", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  targetSkills: json("targetSkills"), // JSON array of skills to develop
+  difficulty: mysqlEnum("difficulty", ["beginner", "intermediate", "advanced"]).default("beginner").notNull(),
+  estimatedHours: int("estimatedHours"),
+  prerequisites: json("prerequisites"), // JSON array of prerequisite topics
+  content: json("content"), // JSON array of lessons/modules
+  status: mysqlEnum("status", ["recommended", "in_progress", "completed", "skipped"]).default("recommended").notNull(),
+  progress: int("progress").default(0), // 0-100
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  studentIdx: index("student_idx").on(table.studentId),
+}));
+
+export type BridgeCourse = typeof bridgeCourses.$inferSelect;
+export type InsertBridgeCourse = typeof bridgeCourses.$inferInsert;

@@ -1,0 +1,292 @@
+import { router, protectedProcedure } from "./_core/trpc";
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { getDb } from "./db";
+import { invokeLLM } from "./_core/llm";
+
+/**
+ * Analytics router for predictive analytics and AI-powered insights
+ */
+export const analyticsRouter = router({
+  // Get student progress predictions
+  getStudentPredictions: protectedProcedure
+    .input(z.object({ studentId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      
+      // Get student goals
+      const goals = await db.query.studentGoals.findMany({
+        where: (goals, { eq }) => eq(goals.studentId, input.studentId),
+      });
+      
+      // Get existing predictions
+      const predictions = await db.query.progressPredictions.findMany({
+        where: (preds, { eq }) => eq(preds.studentId, input.studentId),
+        orderBy: (preds, { desc }) => [desc(preds.generatedAt)],
+      });
+      
+      return { goals, predictions };
+    }),
+  
+  // Generate AI predictions for a student
+  generatePredictions: protectedProcedure
+    .input(z.object({ studentId: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      
+      // Get student data
+      const student = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, input.studentId),
+      });
+      
+      if (!student) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Student not found' });
+      }
+      
+      // Get student goals
+      const goals = await db.query.studentGoals.findMany({
+        where: (goals, { eq }) => eq(goals.studentId, input.studentId),
+      });
+      
+      // Get student progress data (assessments, study time, etc.)
+      const assessments = await db.query.assessments.findMany({
+        where: (assessments, { eq }) => eq(assessments.studentId, input.studentId),
+        limit: 20,
+        orderBy: (assessments, { desc }) => [desc(assessments.completedAt)],
+      });
+      
+      // Use LLM to generate predictions
+      const prompt = `You are an educational AI analyzing student progress. 
+
+Student: ${student.name}
+Current Goals: ${JSON.stringify(goals, null, 2)}
+Recent Assessment Scores: ${assessments.map(a => `${a.score}%`).join(', ')}
+
+Based on this data, generate:
+1. Predicted completion dates for each goal
+2. Predicted final scores
+3. Risk assessment (is the student at risk of missing goals?)
+4. Contributing factors (what's helping or hindering progress?)
+5. Specific recommendations for improvement
+
+Return your analysis as a JSON object with this structure:
+{
+  "predictions": [
+    {
+      "goalId": number,
+      "predictionType": "completion_date" | "final_score" | "at_risk",
+      "predictedValue": string,
+      "confidence": number (0-100),
+      "factors": string[],
+      "recommendations": string[]
+    }
+  ]
+}`;
+
+      const response = await invokeLLM({
+        messages: [
+          { role: "system", content: "You are an educational analytics AI. Always respond with valid JSON." },
+          { role: "user", content: prompt }
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "predictions",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                predictions: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      goalId: { type: "number" },
+                      predictionType: { type: "string" },
+                      predictedValue: { type: "string" },
+                      confidence: { type: "number" },
+                      factors: { type: "array", items: { type: "string" } },
+                      recommendations: { type: "array", items: { type: "string" } }
+                    },
+                    required: ["goalId", "predictionType", "predictedValue", "confidence", "factors", "recommendations"],
+                    additionalProperties: false
+                  }
+                }
+              },
+              required: ["predictions"],
+              additionalProperties: false
+            }
+          }
+        }
+      });
+      
+      const content = response.choices[0].message.content;
+      if (typeof content !== 'string') {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Invalid LLM response' });
+      }
+      const analysis = JSON.parse(content);
+      
+      // Save predictions to database
+      const { progressPredictions } = await import("../drizzle/schema");
+      for (const pred of analysis.predictions) {
+        await db.insert(progressPredictions).values({
+          studentId: input.studentId,
+          goalId: pred.goalId,
+          predictionType: pred.predictionType,
+          predictedValue: pred.predictedValue,
+          confidence: pred.confidence,
+          factors: pred.factors,
+          recommendations: pred.recommendations,
+        });
+      }
+      
+      return { success: true, predictions: analysis.predictions };
+    }),
+  
+  // Get bridge courses for a student
+  getBridgeCourses: protectedProcedure
+    .input(z.object({ studentId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      
+      const courses = await db.query.bridgeCourses.findMany({
+        where: (courses, { eq }) => eq(courses.studentId, input.studentId),
+        orderBy: (courses, { desc }) => [desc(courses.createdAt)],
+      });
+      
+      return courses;
+    }),
+  
+  // Generate bridge courses for a student
+  generateBridgeCourses: protectedProcedure
+    .input(z.object({ studentId: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      
+      // Get student data and predictions
+      const student = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.id, input.studentId),
+      });
+      
+      const predictions = await db.query.progressPredictions.findMany({
+        where: (preds, { eq, and }) => 
+          and(
+            eq(preds.studentId, input.studentId),
+            eq(preds.predictionType, 'at_risk')
+          ),
+        limit: 5,
+      });
+      
+      if (predictions.length === 0) {
+        return { success: true, message: 'No bridge courses needed - student is on track!' };
+      }
+      
+      // Use LLM to generate bridge courses
+      const prompt = `You are an educational curriculum designer. A student needs help catching up.
+
+Student: ${student?.name}
+At-Risk Areas: ${predictions.map((p: any) => p.predictedValue).join(', ')}
+Contributing Factors: ${predictions.map((p: any) => JSON.stringify(p.factors)).join('; ')}
+
+Design 2-3 personalized "bridge courses" to help this student catch up. Each course should:
+- Target specific skill gaps
+- Include clear learning objectives
+- Provide estimated time commitment
+- Break down into digestible modules
+- Include prerequisites
+
+Return your courses as a JSON object:
+{
+  "courses": [
+    {
+      "title": string,
+      "description": string,
+      "targetSkills": string[],
+      "difficulty": "beginner" | "intermediate" | "advanced",
+      "estimatedHours": number,
+      "prerequisites": string[],
+      "content": [
+        {
+          "module": string,
+          "topics": string[],
+          "activities": string[]
+        }
+      ]
+    }
+  ]
+}`;
+
+      const response = await invokeLLM({
+        messages: [
+          { role: "system", content: "You are an educational curriculum designer. Always respond with valid JSON." },
+          { role: "user", content: prompt }
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "bridge_courses",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                courses: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      title: { type: "string" },
+                      description: { type: "string" },
+                      targetSkills: { type: "array", items: { type: "string" } },
+                      difficulty: { type: "string" },
+                      estimatedHours: { type: "number" },
+                      prerequisites: { type: "array", items: { type: "string" } },
+                      content: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            module: { type: "string" },
+                            topics: { type: "array", items: { type: "string" } },
+                            activities: { type: "array", items: { type: "string" } }
+                          },
+                          required: ["module", "topics", "activities"],
+                          additionalProperties: false
+                        }
+                      }
+                    },
+                    required: ["title", "description", "targetSkills", "difficulty", "estimatedHours", "prerequisites", "content"],
+                    additionalProperties: false
+                  }
+                }
+              },
+              required: ["courses"],
+              additionalProperties: false
+            }
+          }
+        }
+      });
+      
+      const content2 = response.choices[0].message.content;
+      if (typeof content2 !== 'string') {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Invalid LLM response' });
+      }
+      const result = JSON.parse(content2);
+      
+      // Save bridge courses to database
+      const { bridgeCourses } = await import("../drizzle/schema");
+      for (const course of result.courses) {
+        await db.insert(bridgeCourses).values({
+          studentId: input.studentId,
+          title: course.title,
+          description: course.description,
+          targetSkills: course.targetSkills,
+          difficulty: course.difficulty as 'beginner' | 'intermediate' | 'advanced',
+          estimatedHours: course.estimatedHours,
+          prerequisites: course.prerequisites,
+          content: course.content,
+        });
+      }
+      
+      return { success: true, courses: result.courses };
+    }),
+});

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS progress_predictions (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL,\n  goalId INT,\n  predictionType VARCHAR(50) NOT NULL,\n  predictedValue VARCHAR(255) NOT NULL,\n  confidence INT,\n  factors JSON,\n  recommendations JSON,\n  generatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX student_idx (studentId),\n  INDEX goal_idx (goalId)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user UqERVjVAX9eY9W2.dc0a0a76636f --database 5L3gkWSwSgtAn7Y93vysCU --execute CREATE TABLE IF NOT EXISTS progress_predictions (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  studentId INT NOT NULL,\n  goalId INT,\n  predictionType VARCHAR(50) NOT NULL,\n  predictedValue VARCHAR(255) NOT NULL,\n  confidence INT,\n  factors JSON,\n  recommendations JSON,\n  generatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX student_idx (studentId),\n  INDEX goal_idx (goalId)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1642
+}

@@ -57,6 +57,13 @@
       "when": 1765292879814,
       "tag": "0007_acoustic_falcon",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1765327153012,
+      "tag": "0008_pale_spacker_dave",
+      "breakpoints": true
     }
   ]
 }

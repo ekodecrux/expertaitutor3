@@ -104,7 +104,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <aside
         className={`${
           sidebarOpen ? "w-64" : "w-0"
-        } transition-all duration-300 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden`}
+        } transition-all duration-300 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col`}
       >
         {/* Logo & Brand */}
         <div className="p-4 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700">

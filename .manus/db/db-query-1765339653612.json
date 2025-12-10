@@ -1,0 +1,160 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user UqERVjVAX9eY9W2.dc0a0a76636f --database 5L3gkWSwSgtAn7Y93vysCU --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "achievements"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "activity_logs"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "bridge_courses"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "class_subjects"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "classes"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "content_favorites"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "content_items"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "conversation_participants"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "conversations"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "currency_transactions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "doubts"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "institutions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "knowledge_profiles"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "leaderboards"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "message_read_status"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "messages"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "milestones"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "notifications"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "organization_subscriptions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "parent_student_links"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "payments"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "progress_predictions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "questions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "review_schedules"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "review_sessions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "roleplay_messages"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "roleplay_scenarios"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "roleplay_sessions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "sections"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "streak_freezes"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "student_achievements"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "student_currency"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "student_enrollments"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "student_game_stats"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "student_goals"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "student_profiles"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "study_plans"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "subjects"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "subscription_plans"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "subscription_usage"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "subscriptions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "test_attempts"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "test_questions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "tests"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "topics"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "tutor_messages"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "tutor_sessions"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "units"
+    },
+    {
+      "Tables_in_5L3gkWSwSgtAn7Y93vysCU": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_5L3gkWSwSgtAn7Y93vysCU\n__drizzle_migrations\nachievements\nactivity_logs\nbridge_courses\nclass_subjects\nclasses\ncontent_favorites\ncontent_items\nconversation_participants\nconversations\ncurrency_transactions\ndoubts\ninstitutions\nknowledge_profiles\nleaderboards\nmessage_read_status\nmessages\nmilestones\nnotifications\norganization_subscriptions\nparent_student_links\npayments\nprogress_predictions\nquestions\nreview_schedules\nreview_sessions\nroleplay_messages\nroleplay_scenarios\nroleplay_sessions\nsections\nstreak_freezes\nstudent_achievements\nstudent_currency\nstudent_enrollments\nstudent_game_stats\nstudent_goals\nstudent_profiles\nstudy_plans\nsubjects\nsubscription_plans\nsubscription_usage\nsubscriptions\ntest_attempts\ntest_questions\ntests\ntopics\ntutor_messages\ntutor_sessions\nunits\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 1611
+}

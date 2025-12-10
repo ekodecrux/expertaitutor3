@@ -202,4 +202,245 @@
   .slide-up {
     animation: slideUp 0.4s ease-out;
   }
+
+  /* ============= MOBILE-FIRST DESIGN ENHANCEMENTS ============= */
+  
+  /* Touch-friendly tap targets (minimum 44x44px) */
+  @media (max-width: 768px) {
+    button,
+    [role="button"],
+    a,
+    input[type="checkbox"],
+    input[type="radio"],
+    select {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Larger text for better readability on mobile */
+    body {
+      font-size: 16px; /* Prevents iOS zoom on input focus */
+    }
+    
+    /* Reduce padding on mobile for more content space */
+    .card-mobile-compact .p-6 {
+      @apply p-4;
+    }
+    
+    /* Stack cards vertically on mobile */
+    .mobile-stack {
+      @apply flex-col;
+    }
+    
+    /* Full-width buttons on mobile */
+    .mobile-full-width {
+      @apply w-full;
+    }
+    
+    /* Hide text labels on mobile, show icons only */
+    .mobile-icon-only .mobile-hide-text {
+      @apply sr-only;
+    }
+    
+    /* Sticky bottom navigation bar */
+    .mobile-bottom-nav {
+      @apply fixed bottom-0 left-0 right-0 z-50;
+      @apply bg-background border-t border-border;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* Safe area insets for notched devices */
+    .safe-area-inset-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .safe-area-inset-top {
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    /* Swipeable cards */
+    .swipeable {
+      touch-action: pan-y;
+      user-select: none;
+    }
+    
+    /* Smooth scrolling on mobile */
+    .mobile-scroll {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    
+    /* Prevent text selection during swipe */
+    .no-select {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    
+    /* Mobile-optimized spacing */
+    .mobile-spacing-tight {
+      @apply space-y-3;
+    }
+    
+    /* Larger input fields for touch */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    textarea,
+    select {
+      min-height: 48px;
+      font-size: 16px; /* Prevents iOS zoom */
+    }
+    
+    /* Mobile-friendly modals */
+    .mobile-modal {
+      @apply rounded-t-xl rounded-b-none;
+      @apply fixed bottom-0 left-0 right-0;
+      @apply max-h-[90vh] overflow-y-auto;
+    }
+    
+    /* Pull-to-refresh indicator space */
+    .mobile-pull-refresh {
+      padding-top: 60px;
+    }
+  }
+  
+  /* Tablet optimizations */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    /* 2-column grid for tablets */
+    .tablet-grid-2 {
+      @apply grid-cols-2;
+    }
+    
+    /* Comfortable tap targets for tablets */
+    button,
+    [role="button"] {
+      min-height: 40px;
+      min-width: 40px;
+    }
+  }
+  
+  /* Desktop optimizations */
+  @media (min-width: 1024px) {
+    /* Hover effects only on desktop */
+    .desktop-hover:hover {
+      @apply scale-105 shadow-lg transition-all duration-200;
+    }
+    
+    /* Show desktop-only elements */
+    .desktop-only {
+      @apply block;
+    }
+    
+    .mobile-only {
+      @apply hidden;
+    }
+  }
+  
+  /* Mobile-only elements */
+  @media (max-width: 1023px) {
+    .desktop-only {
+      @apply hidden;
+    }
+    
+    .mobile-only {
+      @apply block;
+    }
+  }
+  
+  /* Swipe gesture animations */
+  @keyframes swipeLeft {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  
+  @keyframes swipeRight {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+  
+  .swipe-left {
+    animation: swipeLeft 0.3s ease-out forwards;
+  }
+  
+  .swipe-right {
+    animation: swipeRight 0.3s ease-out forwards;
+  }
+  
+  /* Bottom sheet animation */
+  @keyframes slideUpSheet {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  .bottom-sheet {
+    animation: slideUpSheet 0.3s ease-out;
+  }
+  
+  /* Loading skeleton for mobile */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+  
+  .skeleton-text {
+    @apply h-4 bg-muted rounded mb-2;
+  }
+  
+  .skeleton-avatar {
+    @apply w-12 h-12 bg-muted rounded-full;
+  }
+  
+  /* Mobile-friendly card shadows */
+  @media (max-width: 768px) {
+    .card {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-elevated {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  /* Prevent zoom on double-tap (iOS) */
+  * {
+    touch-action: manipulation;
+  }
+  
+  /* Allow vertical scrolling */
+  .scrollable {
+    touch-action: pan-y;
+  }
+  
+  /* Allow horizontal scrolling */
+  .horizontal-scroll {
+    touch-action: pan-x;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

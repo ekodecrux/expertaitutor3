@@ -1520,3 +1520,179 @@
 - [ ] Implement message history and search
 - [ ] Build message filtering by date, sender, priority
 - [ ] Create message export functionality
+
+
+## 🔴 COMPETITIVE FEATURES - HIGH PRIORITY (From World-Class Platform Analysis)
+
+### Feature 1: Socratic Method AI Tutoring (Khan Academy Khanmigo)
+- [ ] Modify AI Tutor prompts to ask guiding questions instead of giving direct answers
+- [ ] Implement progressive hint system (Hint 1 → Hint 2 → Hint 3 → Full Answer)
+- [ ] Add "Show Hint" button in AI Tutor interface
+- [ ] Track student's reasoning process and attempts before revealing answer
+- [ ] Create Socratic prompt templates for different subjects (Math, Science, etc.)
+
+### Feature 2: Mistake Prediction AI (Carnegie Learning MATHia)
+- [ ] Create common_mistakes database table (topic, mistake_pattern, warning_message, hint)
+- [ ] Build mistake pattern detection algorithm
+- [ ] Integrate mistake prediction into assessment flow
+- [ ] Show preemptive warnings when student's approach matches common mistake pattern
+- [ ] Collect mistake data from assessments to improve predictions over time
+
+### Feature 3: Ultra-Granular Knowledge Mapping (Squirrel AI)
+- [ ] Design knowledge graph schema (micro_concepts table with dependencies)
+- [ ] Break down each subject into 1000+ micro-concepts
+- [ ] Create dependency mapping (Concept B requires Concept A mastery)
+- [ ] Track mastery percentage (0-100%) for each micro-concept
+- [ ] Build visual knowledge map component showing completed vs pending concepts
+- [ ] Implement dependency-based lesson unlocking (can't learn B until A is mastered)
+
+### Feature 4: Real-Time Adaptive Difficulty (Squirrel AI)
+- [ ] Add difficulty_level field to assessment questions (easy/medium/hard/expert)
+- [ ] Implement adaptive difficulty algorithm (3 correct → increase, 2 wrong → decrease)
+- [ ] Create difficulty-aware scoring system (harder questions = more points)
+- [ ] Show difficulty indicator to students during assessment
+- [ ] Track optimal challenge zone per student
+
+### Feature 5: Enhanced Gamification with Streaks & Rewards (Duolingo Max)
+- [x] Create gamification database tables (streaks, leaderboards, virtual_currency, achievement_badges)
+- [x] Implement daily streak tracking with flame icon 🔥
+- [x] Add streak freeze feature (use once per week to protect streak)
+- [x] Build leaderboard system (weekly/monthly by class/school/global)
+- [x] Create virtual currency system (earn coins for lessons, spend on avatar customization)
+- [x] Design 20+ achievement badges (7-Day Warrior, Perfect Score Master, Bridge Course Champion, etc.)
+- [x] Add milestone celebrations (10%, 25%, 50%, 75%, 100% syllabus completion)
+- [x] Create enhanced gamification dashboard showing XP, level, coins, badges, streak
+
+### Feature 6: Mobile-First Responsive Design (Duolingo Max)
+- [x] **Phase 1: Mobile Web Optimization**
+  - [x] Increase button sizes for touch-friendly interaction (min 44x44px tap targets)
+  - [x] Implement swipe gestures (left/right for next/previous lesson)
+  - [x] Add bottom navigation bar for easier thumb reach
+  - [x] Reduce text density, increase visual elements for mobile
+  - [ ] Test on iOS Safari, Android Chrome, various screen sizes
+- [ ] **Phase 2: Progressive Web App (PWA)**
+  - [ ] Add service worker for offline caching
+  - [ ] Implement push notification support
+  - [ ] Add web app manifest for "Add to Home Screen"
+  - [ ] Cache lessons and assessments for offline access
+- [ ] **Phase 3: Native Mobile Apps (Future)**
+  - [ ] Research React Native vs Flutter
+  - [ ] Plan iOS and Android app architecture
+  - [ ] Prepare for App Store and Play Store submission
+
+### Feature 7: Teacher Analytics Dashboard (MATHia, Century Tech)
+- [ ] Create analytics database tables (student_activity_logs, engagement_metrics)
+- [ ] Build class heatmap component (visual grid with green/yellow/red status per student)
+- [ ] Implement at-risk student detection algorithm with AI recommendations
+- [ ] Create common mistakes report showing topics entire class struggles with
+- [ ] Add time analytics (time spent per student, per topic)
+- [ ] Build engagement metrics dashboard (login frequency, lesson completion rate, assessment participation)
+- [ ] Add intervention recommendations ("5 students need help with Trigonometry")
+- [ ] Create teacher analytics page with all insights in one view
+
+## 🟡 COMPETITIVE FEATURES - MEDIUM PRIORITY
+
+### Feature 8: Neuroscience-Based Learning (Spaced Repetition) (Century Tech)
+- [ ] Implement spaced repetition algorithm (review at 1, 3, 7, 14, 30 days)
+- [ ] Create forgetting curve prediction model
+- [ ] Schedule automatic review sessions before student forgets
+- [ ] Add short 5-minute review tasks instead of full re-learning
+- [ ] Track long-term retention metrics
+
+### Feature 9: AI Roleplay Conversations (Duolingo Max)
+- [ ] Create roleplay scenarios database (science experiments, history debates, math word problems)
+- [ ] Build roleplay mode in AI Tutor (AI takes specific character/role)
+- [ ] Implement science experiment roleplay (AI as lab partner)
+- [ ] Add history debate roleplay (AI takes opposing viewpoint)
+- [ ] Create math word problem roleplay (AI as shopkeeper/banker)
+- [ ] Add language practice roleplay (AI converses in English/Hindi)
+- [ ] Implement interview prep roleplay (AI conducts mock interviews)
+
+### Feature 10: Collaborative Learning Features (Khan Academy)
+- [ ] Create study_groups database table
+- [ ] Build study group creation and joining interface
+- [ ] Implement shared notes feature (students share notes with classmates)
+- [ ] Create peer Q&A forum (students ask, peers/teachers answer)
+- [ ] Add group challenges (teams compete in quizzes)
+- [ ] Implement peer tutoring system (high-performers tutor struggling peers, earn bonus XP)
+
+### Feature 11: Content Library with Videos (Khan Academy, Century Tech)
+- [ ] **Option 1: YouTube Integration (Quick Win)**
+  - [ ] Create video_library database table
+  - [ ] Integrate YouTube API for educational videos
+  - [ ] Curate Khan Academy, Byju's, Unacademy video playlists
+  - [ ] Add video player component with progress tracking
+- [ ] **Option 2: AI-Generated Videos (Future)**
+  - [ ] Research text-to-video AI services
+  - [ ] Generate video lessons from text content
+- [ ] Add interactive simulations (physics experiments, chemistry reactions)
+- [ ] Create animated explanations for complex concepts
+
+### Feature 12: Parent Engagement Tools (Khanmigo)
+- [x] Build automated weekly progress email system (sends every Sunday)
+- [x] Create parent tips generator ("Your child is struggling with Algebra. Here's how to help...")
+- [x] Add conversation starters ("Ask your child: What did you learn about photosynthesis?")
+- [x] Implement milestone celebration emails (25%, 50%, 75%, 100% completion)
+- [x] Add warning alert emails (child hasn't logged in for 3 days, falling behind)
+- [x] Create email templates for all parent communication
+
+### Feature 13: Teacher Resource Library (Khan Academy)
+- [ ] Build AI-powered lesson plan generator based on curriculum
+- [ ] Create rubric creator for grading assignments
+- [ ] Add exit ticket generator (quick 3-question quizzes)
+- [ ] Implement worksheet generator (printable practice worksheets)
+- [ ] Build quiz bank with pre-made quizzes for all topics
+- [ ] Add teaching tips database (best practices per topic)
+- [ ] Create teacher resources page with all tools
+
+### Feature 14: Offline Mode (Duolingo, Squirrel AI)
+- [ ] Implement PWA offline caching for lessons
+- [ ] Add download lessons feature for native apps
+- [ ] Create sync mechanism (upload progress when online)
+- [ ] Enable offline assessments (sync results later)
+- [ ] Add offline indicator in UI
+
+## 🟢 COMPETITIVE FEATURES - LOW PRIORITY (Future Enhancements)
+
+### Feature 15: Multi-Language Support (Duolingo, Khan Academy)
+- [ ] **Phase 1: Hindi Support**
+  - [ ] Set up i18n library (react-i18next)
+  - [ ] Translate all UI text to Hindi
+  - [ ] Add language switcher in settings
+  - [ ] Implement Hindi voice for AI Tutor
+- [ ] **Phase 2: Regional Languages**
+  - [ ] Add Tamil, Telugu, Bengali, Marathi, Gujarati translations
+  - [ ] Add regional language voices for AI Tutor
+- [ ] **Phase 3: International Languages**
+  - [ ] Add Arabic, Spanish for global expansion
+
+### Feature 16: Physical Learning Centers (Squirrel AI)
+- [ ] Research partnerships with existing coaching centers
+- [ ] Plan hybrid model (online lessons + weekly in-person sessions)
+- [ ] Design smart tablet setup with ACES-AIProfessor pre-installed
+- [ ] Create on-site proctor system for exams
+
+### Feature 17: AR/VR Immersive Lessons (Emerging EdTech)
+- [ ] Research AR libraries (AR.js, 8th Wall)
+- [ ] Create AR mode for 3D models (human heart, solar system)
+- [ ] Research VR platforms for virtual labs
+- [ ] Build 3D visualizations (geometry shapes, molecular structures)
+
+### Feature 18: Emotion Detection AI (Emerging EdTech)
+- [ ] Research facial expression detection libraries
+- [ ] Implement webcam-based emotion tracking (optional, privacy-sensitive)
+- [ ] Add AI response to detected emotions (confusion → slow down, frustration → easier problem)
+- [ ] Create privacy controls and consent system
+
+### Feature 19: Voice-Based Assessments (Emerging EdTech)
+- [ ] Implement voice recording in assessments
+- [ ] Integrate speech-to-text transcription
+- [ ] Build AI evaluation for pronunciation, fluency, grammar
+- [ ] Add voice assessment mode for language learning and interview prep
+
+### Feature 20: Blockchain Certificates (Emerging EdTech)
+- [ ] Research blockchain platforms (Ethereum, Polygon)
+- [ ] Design digital certificate system
+- [ ] Implement blockchain certificate issuance for course completion
+- [ ] Create certificate verification portal
+- [ ] Add NFT badges for achievements

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE INDEX IF NOT EXISTS `trans_student_idx` ON `currency_transactions` (`studentUserId`);\nCREATE INDEX IF NOT EXISTS `trans_created_idx` ON `currency_transactions` (`createdAt`);\nCREATE INDEX IF NOT EXISTS `lead_student_idx` ON `leaderboards` (`studentUserId`);\nCREATE INDEX IF NOT EXISTS `lead_scope_idx` ON `leaderboards` (`scope`,`scopeId`);\nCREATE INDEX IF NOT EXISTS `lead_period_idx` ON `leaderboards` (`period`);\nCREATE INDEX IF NOT EXISTS `lead_rank_idx` ON `leaderboards` (`rank`);\nCREATE INDEX IF NOT EXISTS `milestone_student_idx` ON `milestones` (`studentUserId`);\nCREATE INDEX IF NOT EXISTS `milestone_type_idx` ON `milestones` (`milestoneType`);\nCREATE INDEX IF NOT EXISTS `freeze_student_idx` ON `streak_freezes` (`studentUserId`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user UqERVjVAX9eY9W2.dc0a0a76636f --database 5L3gkWSwSgtAn7Y93vysCU --execute CREATE INDEX IF NOT EXISTS `trans_student_idx` ON `currency_transactions` (`studentUserId`);\nCREATE INDEX IF NOT EXISTS `trans_created_idx` ON `currency_transactions` (`createdAt`);\nCREATE INDEX IF NOT EXISTS `lead_student_idx` ON `leaderboards` (`studentUserId`);\nCREATE INDEX IF NOT EXISTS `lead_scope_idx` ON `leaderboards` (`scope`,`scopeId`);\nCREATE INDEX IF NOT EXISTS `lead_period_idx` ON `leaderboards` (`period`);\nCREATE INDEX IF NOT EXISTS `lead_rank_idx` ON `leaderboards` (`rank`);\nCREATE INDEX IF NOT EXISTS `milestone_student_idx` ON `milestones` (`studentUserId`);\nCREATE INDEX IF NOT EXISTS `milestone_type_idx` ON `milestones` (`milestoneType`);\nCREATE INDEX IF NOT EXISTS `freeze_student_idx` ON `streak_freezes` (`studentUserId`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 7170
+}

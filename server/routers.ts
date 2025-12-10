@@ -16,6 +16,7 @@ import { teacherRouter } from "./routers-teacher";
 import { parentRouter } from "./routers-parent";
 import { superAdminRouter } from "./routers-superadmin";
 import { messagingRouter } from "./routers-messaging";
+// import { gamificationRouter } from "./routers/gamification";
 
 // ============= RBAC MIDDLEWARE =============
 
@@ -700,8 +701,11 @@ Provide a week-by-week breakdown with topics to cover.`,
 
   // ============= SUPER ADMIN MANAGEMENT =============
   superadmin: superAdminRouter,
-  messaging: messagingRouter,
-
+   messaging: messagingRouter,
+  
+  // ============= GAMIFICATION =============
+  // gamification: gamificationRouter, // Temporarily disabled for build
+  
   // ============= FILE UPLOAD =============
   
   upload: router({

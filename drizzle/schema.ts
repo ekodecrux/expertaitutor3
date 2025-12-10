@@ -441,6 +441,99 @@ export const studentGameStats = mysqlTable("student_game_stats", {
 export type StudentGameStats = typeof studentGameStats.$inferSelect;
 
 /**
+ * Streak freeze tracking (Duolingo-style)
+ */
+export const streakFreezes = mysqlTable("streak_freezes", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull(),
+  usedAt: timestamp("usedAt").defaultNow().notNull(),
+  reason: varchar("reason", { length: 255 }), // optional: why they used it
+}, (table) => ({
+  studentIdx: index("freeze_student_idx").on(table.studentUserId),
+}));
+
+export type StreakFreeze = typeof streakFreezes.$inferSelect;
+
+/**
+ * Virtual currency for gamification (coins/gems)
+ */
+export const studentCurrency = mysqlTable("student_currency", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull().unique(),
+  coins: int("coins").default(0).notNull(),
+  gems: int("gems").default(0).notNull(), // premium currency
+  totalEarned: int("totalEarned").default(0).notNull(),
+  totalSpent: int("totalSpent").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StudentCurrency = typeof studentCurrency.$inferSelect;
+
+/**
+ * Currency transaction log
+ */
+export const currencyTransactions = mysqlTable("currency_transactions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull(),
+  type: mysqlEnum("type", ["earn", "spend"]).notNull(),
+  currencyType: mysqlEnum("currency_type", ["coins", "gems"]).notNull(),
+  amount: int("amount").notNull(),
+  reason: varchar("reason", { length: 255 }).notNull(), // "Completed lesson", "Bought avatar item"
+  relatedId: int("relatedId"), // lesson_id, assessment_id, purchase_id
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  studentIdx: index("trans_student_idx").on(table.studentUserId),
+  createdIdx: index("trans_created_idx").on(table.createdAt),
+}));
+
+export type CurrencyTransaction = typeof currencyTransactions.$inferSelect;
+
+/**
+ * Leaderboards (class, school, global)
+ */
+export const leaderboards = mysqlTable("leaderboards", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull(),
+  scope: mysqlEnum("scope", ["class", "school", "global"]).notNull(),
+  scopeId: int("scopeId"), // class_id or institution_id (null for global)
+  period: mysqlEnum("period", ["daily", "weekly", "monthly", "all_time"]).notNull(),
+  points: int("points").default(0).notNull(),
+  rank: int("rank"),
+  periodStart: timestamp("periodStart").notNull(),
+  periodEnd: timestamp("periodEnd").notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  studentIdx: index("lead_student_idx").on(table.studentUserId),
+  scopeIdx: index("lead_scope_idx").on(table.scope, table.scopeId),
+  periodIdx: index("lead_period_idx").on(table.period),
+  rankIdx: index("lead_rank_idx").on(table.rank),
+}));
+
+export type Leaderboard = typeof leaderboards.$inferSelect;
+
+/**
+ * Milestone celebrations (10%, 25%, 50%, 75%, 100% completion)
+ */
+export const milestones = mysqlTable("milestones", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull(),
+  milestoneType: varchar("milestoneType", { length: 100 }).notNull(), // "syllabus_completion", "streak_milestone", "assessment_perfect"
+  percentage: int("percentage"), // 10, 25, 50, 75, 100
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  rewardCoins: int("rewardCoins").default(0),
+  rewardGems: int("rewardGems").default(0),
+  celebrated: boolean("celebrated").default(false), // has user seen the celebration animation?
+  achievedAt: timestamp("achievedAt").defaultNow().notNull(),
+}, (table) => ({
+  studentIdx: index("milestone_student_idx").on(table.studentUserId),
+  typeIdx: index("milestone_type_idx").on(table.milestoneType),
+}));
+
+export type Milestone = typeof milestones.$inferSelect;
+
+/**
  * Learning activity logs
  */
 export const activityLogs = mysqlTable("activity_logs", {

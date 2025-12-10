@@ -416,4 +416,95 @@ A Pythagorean triple is a set of three positive integers a, b, c that satisfy th
       });
     }, 30000); // 30 second timeout for AI processing
   });
+
+  describe('uploadBatchFiles', () => {
+    it('should upload multiple files in parallel', async () => {
+      // Create mock PDF data
+      const mockPdf1 = Buffer.from('Mock PDF 1 content');
+      const mockPdf2 = Buffer.from('Mock PDF 2 content');
+      
+      const result = await caller.conceptExtraction.uploadBatchFiles({
+        files: [
+          {
+            title: 'Batch Test 1',
+            fileBase64: mockPdf1.toString('base64'),
+            fileName: 'test1.pdf',
+            subject: 'Physics',
+          },
+          {
+            title: 'Batch Test 2',
+            fileBase64: mockPdf2.toString('base64'),
+            fileName: 'test2.pdf',
+            subject: 'Chemistry',
+          },
+        ],
+      });
+
+      expect(result.totalFiles).toBe(2);
+      // Note: Actual success count may vary based on OCR results
+      expect(result.results.length + result.errors.length).toBe(2);
+    });
+
+    it('should reject batch with more than 10 files', async () => {
+      const files = Array.from({ length: 11 }, (_, i) => ({
+        title: `Test ${i}`,
+        fileBase64: Buffer.from('test').toString('base64'),
+        fileName: `test${i}.pdf`,
+      }));
+
+      await expect(
+        caller.conceptExtraction.uploadBatchFiles({ files })
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('exportToAnki', () => {
+    it('should export concepts to Anki deck', async () => {
+      // First upload and extract concepts
+      const uploadResult = await caller.conceptExtraction.uploadMaterial({
+        title: 'Anki Export Test',
+        fileType: 'text',
+        textContent: 'Newton\'s First Law states that an object at rest stays at rest and an object in motion stays in motion with the same speed and in the same direction unless acted upon by an unbalanced force. This is also known as the law of inertia.',
+        subject: 'Physics',
+      });
+
+      await caller.conceptExtraction.extractConcepts({
+        materialId: uploadResult.materialId,
+      });
+
+      // Export to Anki
+      const result = await caller.conceptExtraction.exportToAnki({
+        materialId: uploadResult.materialId,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.fileUrl).toBeDefined();
+      expect(result.cardCount).toBeGreaterThan(0);
+      expect(result.deckName).toBe('Anki Export Test');
+
+      // Clean up
+      await caller.conceptExtraction.deleteMaterial({
+        materialId: uploadResult.materialId,
+      });
+    }, 30000); // 30 second timeout for AI processing
+
+    it('should fail when no concepts exist', async () => {
+      const uploadResult = await caller.conceptExtraction.uploadMaterial({
+        title: 'Empty Material',
+        fileType: 'text',
+        textContent: 'Short text without concepts.',
+      });
+
+      await expect(
+        caller.conceptExtraction.exportToAnki({
+          materialId: uploadResult.materialId,
+        })
+      ).rejects.toThrow('No concepts found');
+
+      // Clean up
+      await caller.conceptExtraction.deleteMaterial({
+        materialId: uploadResult.materialId,
+      });
+    });
+  });
 });

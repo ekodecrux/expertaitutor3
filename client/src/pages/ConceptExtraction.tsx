@@ -25,6 +25,7 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  Download,
 } from "lucide-react";
 
 export default function ConceptExtraction() {
@@ -37,6 +38,8 @@ export default function ConceptExtraction() {
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const [batchFiles, setBatchFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<Record<string, { status: 'pending' | 'uploading' | 'completed' | 'failed'; error?: string }>>({});
 
   const utils = trpc.useUtils();
 
@@ -108,6 +111,33 @@ export default function ConceptExtraction() {
     onError: (error) => {
       toast.error(`Upload failed: ${error.message}`);
       setIsProcessingFile(false);
+    },
+  });
+
+  const uploadBatchMutation = trpc.conceptExtraction.uploadBatchFiles.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Batch upload complete! ${data.successCount}/${data.totalFiles} files processed successfully`);
+      if (data.failureCount > 0) {
+        toast.error(`${data.failureCount} files failed to upload`);
+      }
+      // Clear batch files
+      setBatchFiles([]);
+      setUploadProgress({});
+      utils.conceptExtraction.getMaterials.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Batch upload failed: ${error.message}`);
+    },
+  });
+
+  const exportAnkiMutation = trpc.conceptExtraction.exportToAnki.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Anki deck created with ${data.cardCount} flashcards!`);
+      // Download the file
+      window.open(data.fileUrl, '_blank');
+    },
+    onError: (error) => {
+      toast.error(`Export failed: ${error.message}`);
     },
   });
 
@@ -296,10 +326,10 @@ export default function ConceptExtraction() {
 
               <Separator />
 
-              {/* File Upload Section */}
+              {/* Single File Upload Section */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Label>Upload PDF or Image</Label>
+                  <Label>Upload Single PDF or Image</Label>
                   <Badge variant="outline" className="text-xs">OCR Enabled</Badge>
                 </div>
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
@@ -361,6 +391,110 @@ export default function ConceptExtraction() {
                         <p className="font-medium">Click to upload PDF or Image</p>
                         <p className="text-xs text-muted-foreground">
                           Supports PDF, PNG, JPG, GIF, BMP, WebP (Max 16MB)
+                        </p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Batch Upload Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Label>Batch Upload (Multiple Files)</Label>
+                  <Badge variant="outline" className="text-xs">Up to 10 files</Badge>
+                </div>
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                  <input
+                    type="file"
+                    id="batch-upload"
+                    accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp,.webp"
+                    multiple
+                    onChange={async (e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (files.length === 0) return;
+                      
+                      // Validate file count
+                      if (files.length > 10) {
+                        toast.error("Maximum 10 files allowed per batch");
+                        return;
+                      }
+                      
+                      // Validate file sizes
+                      const oversizedFiles = files.filter(f => f.size > 16 * 1024 * 1024);
+                      if (oversizedFiles.length > 0) {
+                        toast.error(`${oversizedFiles.length} file(s) exceed 16MB limit`);
+                        return;
+                      }
+                      
+                      setBatchFiles(files);
+                      
+                      // Initialize progress tracking
+                      const progress: Record<string, { status: 'pending' | 'uploading' | 'completed' | 'failed' }> = {};
+                      files.forEach(f => {
+                        progress[f.name] = { status: 'pending' };
+                      });
+                      setUploadProgress(progress);
+                      
+                      // Convert all files to base64
+                      const filePromises = files.map(file => {
+                        return new Promise<{ title: string; fileBase64: string; fileName: string }>((resolve) => {
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            const base64 = reader.result as string;
+                            const base64Data = base64.split(',')[1];
+                            resolve({
+                              title: file.name.replace(/\.[^/.]+$/, ""),
+                              fileBase64: base64Data,
+                              fileName: file.name,
+                            });
+                          };
+                          reader.readAsDataURL(file);
+                        });
+                      });
+                      
+                      const filesData = await Promise.all(filePromises);
+                      
+                      // Upload batch
+                      uploadBatchMutation.mutate({
+                        files: filesData.map(f => ({
+                          ...f,
+                          subject,
+                          topic,
+                          curriculum,
+                        })),
+                      });
+                    }}
+                    className="hidden"
+                  />
+                  <label htmlFor="batch-upload" className="cursor-pointer">
+                    {batchFiles.length > 0 ? (
+                      <div className="space-y-3">
+                        <FileText className="h-12 w-12 mx-auto text-primary" />
+                        <p className="font-medium">{batchFiles.length} files selected</p>
+                        <div className="max-h-40 overflow-y-auto space-y-1">
+                          {batchFiles.map((file, idx) => (
+                            <div key={idx} className="text-xs text-muted-foreground flex items-center justify-between px-4">
+                              <span>{file.name}</span>
+                              <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                            </div>
+                          ))}
+                        </div>
+                        {uploadBatchMutation.isPending && (
+                          <div className="flex items-center justify-center gap-2 text-sm text-blue-600">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Processing batch upload...
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
+                        <p className="font-medium">Click to upload multiple files</p>
+                        <p className="text-xs text-muted-foreground">
+                          Select up to 10 PDF or image files (Max 16MB each)
                         </p>
                       </div>
                     )}
@@ -494,15 +628,30 @@ export default function ConceptExtraction() {
                     </CardDescription>
                   </div>
                   {selectedMaterialId && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(selectedMaterialId)}
-                      disabled={deleteMutation.isPending}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => exportAnkiMutation.mutate({ materialId: selectedMaterialId })}
+                        disabled={exportAnkiMutation.isPending || !concepts || concepts.length === 0}
+                      >
+                        {exportAnkiMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4 mr-2" />
+                        )}
+                        Export to Anki
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(selectedMaterialId)}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </Button>
+                    </div>
                   )}
                 </div>
               </CardHeader>

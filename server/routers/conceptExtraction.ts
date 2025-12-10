@@ -7,6 +7,7 @@ import { studyMaterials, extractedConcepts, conceptRelationships, conceptNotes }
 import { eq, and, desc } from "drizzle-orm";
 import { storagePut } from "../storage";
 import { extractTextFromFile } from "../utils/ocr";
+import { generateAnkiDeck, type ConceptCard } from "../utils/ankiExport";
 
 /**
  * AI-Powered Concept Extraction Router
@@ -480,6 +481,167 @@ Please extract all important concepts and their relationships.`,
         extractedText: text.substring(0, 500) + (text.length > 500 ? '...' : ''),
         fileUrl,
         message: 'File uploaded and text extracted successfully. Processing will begin shortly.',
+      };
+    }),
+
+  /**
+   * Upload multiple files with parallel OCR processing
+   */
+  uploadBatchFiles: protectedProcedure
+    .input(z.object({
+      files: z.array(z.object({
+        title: z.string().min(1).max(255),
+        description: z.string().optional(),
+        fileBase64: z.string(),
+        fileName: z.string(),
+        subject: z.string().optional(),
+        topic: z.string().optional(),
+        curriculum: z.string().optional(),
+      })).max(10), // Limit to 10 files per batch
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const results: Array<{
+        fileName: string;
+        materialId: number;
+        status: string;
+        extractedTextLength: number;
+      }> = [];
+      const errors: Array<{
+        fileName: string;
+        status: string;
+        error: string;
+      }> = [];
+
+      // Process files in parallel
+      await Promise.allSettled(
+        input.files.map(async (file, index) => {
+          try {
+            // Decode base64 file
+            const buffer = Buffer.from(file.fileBase64, 'base64');
+            
+            // Validate file size (16MB limit)
+            if (buffer.length > 16 * 1024 * 1024) {
+              throw new Error('File size exceeds 16MB limit');
+            }
+
+            // Extract text using OCR
+            const { text, fileType } = await extractTextFromFile(buffer);
+            
+            if (!text || text.trim().length < 50) {
+              throw new Error('Could not extract sufficient text from file');
+            }
+
+            // Upload file to S3
+            const fileKey = `study-materials/${ctx.user.id}/${Date.now()}-${index}-${file.fileName}`;
+            const { url: fileUrl } = await storagePut(fileKey, buffer, fileType === 'pdf' ? 'application/pdf' : 'image/png');
+
+            // Create study material record
+            const db = await getDb();
+            if (!db) throw new Error('Database not available');
+            
+            const [material] = await db.insert(studyMaterials).values({
+              userId: ctx.user.id,
+              title: file.title,
+              description: file.description,
+              fileType,
+              fileUrl,
+              textContent: text,
+              subject: file.subject,
+              topic: file.topic,
+              curriculum: file.curriculum,
+              processingStatus: 'pending',
+            });
+
+            results.push({
+              fileName: file.fileName,
+              materialId: material.insertId,
+              status: 'success',
+              extractedTextLength: text.length,
+            });
+          } catch (error) {
+            errors.push({
+              fileName: file.fileName,
+              status: 'failed',
+              error: error instanceof Error ? error.message : 'Unknown error',
+            });
+          }
+        })
+      );
+
+      return {
+        totalFiles: input.files.length,
+        successCount: results.length,
+        failureCount: errors.length,
+        results,
+        errors,
+        message: `Processed ${results.length}/${input.files.length} files successfully`,
+      };
+    }),
+
+  /**
+   * Export concepts to Anki flashcard deck (.apkg file)
+   */
+  exportToAnki: protectedProcedure
+    .input(z.object({
+      materialId: z.number(),
+      deckName: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Get material
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+      
+      const [material] = await db.select().from(studyMaterials)
+        .where(and(
+          eq(studyMaterials.id, input.materialId),
+          eq(studyMaterials.userId, ctx.user.id)
+        ));
+
+      if (!material) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Study material not found',
+        });
+      }
+
+      // Get concepts for this material
+      const concepts = await db.select().from(extractedConcepts)
+        .where(eq(extractedConcepts.materialId, input.materialId))
+        .orderBy(desc(extractedConcepts.importanceScore));
+
+      if (concepts.length === 0) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'No concepts found for this material. Please extract concepts first.',
+        });
+      }
+
+      // Convert to ConceptCard format
+      const conceptCards: ConceptCard[] = concepts.map(c => ({
+        conceptName: c.conceptName,
+        definition: c.definition,
+        explanation: c.explanation,
+        examples: c.examples,
+        keywords: c.keywords,
+        category: c.category,
+        difficulty: c.difficulty,
+        importanceScore: c.importanceScore,
+      }));
+
+      // Generate Anki deck
+      const deckName = input.deckName || material.title;
+      const apkgBuffer = await generateAnkiDeck(deckName, conceptCards);
+
+      // Upload to S3
+      const fileKey = `anki-decks/${ctx.user.id}/${Date.now()}-${deckName.replace(/[^a-zA-Z0-9]/g, '_')}.apkg`;
+      const { url: fileUrl } = await storagePut(fileKey, apkgBuffer, 'application/zip');
+
+      return {
+        success: true,
+        fileUrl,
+        deckName,
+        cardCount: concepts.length,
+        message: `Generated Anki deck with ${concepts.length} flashcards`,
       };
     }),
 

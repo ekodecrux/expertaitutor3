@@ -2092,3 +2092,14 @@
 - [ ] Add zoom, pan, and node interaction to concept map
 - [ ] Build spaced repetition flashcard system
 - [ ] Implement SM-2 algorithm for review scheduling
+
+
+## Phase 40: Batch Upload & Anki Export
+- [x] Implement batch file upload endpoint with parallel OCR processing
+- [x] Add upload progress tracking for multiple files
+- [x] Create frontend UI for drag-and-drop multiple files
+- [x] Show individual file processing status (uploading/extracting/completed/failed)
+- [x] Implement Anki .apkg file generation from extracted concepts
+- [x] Add export to Anki button in concept extraction UI
+- [x] Include spaced repetition metadata in Anki cards
+- [x] Write vitest tests for batch upload and Anki export

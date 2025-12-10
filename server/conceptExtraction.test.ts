@@ -507,4 +507,101 @@ A Pythagorean triple is a set of three positive integers a, b, c that satisfy th
       });
     });
   });
+
+  describe('searchConcepts', () => {
+    it('should search concepts by query text', async () => {
+      const result = await caller.conceptExtraction.searchConcepts({
+        query: 'Newton',
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(result).toHaveProperty('concepts');
+      expect(result).toHaveProperty('total');
+      expect(result).toHaveProperty('hasMore');
+      expect(Array.isArray(result.concepts)).toBe(true);
+    });
+
+    it('should filter by difficulty', async () => {
+      const result = await caller.conceptExtraction.searchConcepts({
+        difficulty: 'intermediate',
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(result).toHaveProperty('concepts');
+      if (result.concepts.length > 0) {
+        result.concepts.forEach(concept => {
+          expect(concept.difficulty).toBe('intermediate');
+        });
+      }
+    });
+
+    it('should filter by category', async () => {
+      const result = await caller.conceptExtraction.searchConcepts({
+        category: 'definition',
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(result).toHaveProperty('concepts');
+      if (result.concepts.length > 0) {
+        result.concepts.forEach(concept => {
+          expect(concept.category).toBe('definition');
+        });
+      }
+    });
+
+    it('should filter by importance score range', async () => {
+      const result = await caller.conceptExtraction.searchConcepts({
+        minImportance: 70,
+        maxImportance: 100,
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(result).toHaveProperty('concepts');
+      if (result.concepts.length > 0) {
+        result.concepts.forEach(concept => {
+          expect(concept.importanceScore).toBeGreaterThanOrEqual(70);
+          expect(concept.importanceScore).toBeLessThanOrEqual(100);
+        });
+      }
+    });
+
+    it('should filter by subject', async () => {
+      const result = await caller.conceptExtraction.searchConcepts({
+        subject: 'physics',
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(result).toHaveProperty('concepts');
+      expect(Array.isArray(result.concepts)).toBe(true);
+    });
+
+    it('should combine multiple filters', async () => {
+      const result = await caller.conceptExtraction.searchConcepts({
+        query: 'law',
+        difficulty: 'intermediate',
+        category: 'principle',
+        minImportance: 50,
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(result).toHaveProperty('concepts');
+      expect(result).toHaveProperty('total');
+      expect(Array.isArray(result.concepts)).toBe(true);
+    });
+
+    it('should respect pagination limits', async () => {
+      const result = await caller.conceptExtraction.searchConcepts({
+        limit: 5,
+        offset: 0,
+      });
+
+      expect(result.concepts.length).toBeLessThanOrEqual(5);
+    });
+  });
 });

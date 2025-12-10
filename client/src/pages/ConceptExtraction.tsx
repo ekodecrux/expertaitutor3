@@ -26,6 +26,9 @@ import {
   Clock,
   XCircle,
   Download,
+  Search,
+  Filter,
+  X,
 } from "lucide-react";
 
 export default function ConceptExtraction() {
@@ -40,11 +43,32 @@ export default function ConceptExtraction() {
   const [isProcessingFile, setIsProcessingFile] = useState(false);
   const [batchFiles, setBatchFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<Record<string, { status: 'pending' | 'uploading' | 'completed' | 'failed'; error?: string }>>({});
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchSubject, setSearchSubject] = useState<string | undefined>();
+  const [searchDifficulty, setSearchDifficulty] = useState<'beginner' | 'intermediate' | 'advanced' | undefined>();
+  const [searchCategory, setSearchCategory] = useState<'definition' | 'formula' | 'theorem' | 'principle' | 'fact' | undefined>();
+  const [minImportance, setMinImportance] = useState<number | undefined>();
+  const [maxImportance, setMaxImportance] = useState<number | undefined>();
 
   const utils = trpc.useUtils();
 
   // Queries
   const { data: materials, isLoading: materialsLoading } = trpc.conceptExtraction.getMaterials.useQuery();
+  const { data: searchResults, isLoading: searchLoading } = trpc.conceptExtraction.searchConcepts.useQuery(
+    {
+      query: searchQuery || undefined,
+      subject: searchSubject,
+      difficulty: searchDifficulty,
+      category: searchCategory,
+      minImportance,
+      maxImportance,
+      limit: 50,
+      offset: 0,
+    },
+    { enabled: false } // Only search when user clicks search button
+  );
   const { data: concepts, isLoading: conceptsLoading } = trpc.conceptExtraction.getConcepts.useQuery(
     { materialId: selectedMaterialId! },
     { enabled: !!selectedMaterialId }
@@ -230,7 +254,7 @@ export default function ConceptExtraction() {
       </div>
 
       <Tabs defaultValue="upload" className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-3xl grid-cols-3">
           <TabsTrigger value="upload" className="gap-2">
             <Upload className="h-4 w-4" />
             Upload Material
@@ -238,6 +262,10 @@ export default function ConceptExtraction() {
           <TabsTrigger value="library" className="gap-2">
             <BookOpen className="h-4 w-4" />
             My Library ({materials?.length || 0})
+          </TabsTrigger>
+          <TabsTrigger value="search" className="gap-2">
+            <Search className="h-4 w-4" />
+            Search Concepts
           </TabsTrigger>
         </TabsList>
 
@@ -741,6 +769,247 @@ export default function ConceptExtraction() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        {/* Search Tab */}
+        <TabsContent value="search" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Search Concepts
+              </CardTitle>
+              <CardDescription>
+                Search across all your extracted concepts with advanced filters
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Search Input */}
+              <div className="space-y-2">
+                <Label htmlFor="search-query">Search Query</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="search-query"
+                    placeholder="Search concept names, definitions, explanations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        utils.conceptExtraction.searchConcepts.refetch();
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={() => utils.conceptExtraction.searchConcepts.refetch()}
+                    disabled={searchLoading}
+                  >
+                    {searchLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="search-subject">Subject</Label>
+                  <Select value={searchSubject} onValueChange={(val) => setSearchSubject(val === 'all' ? undefined : val)}>
+                    <SelectTrigger id="search-subject">
+                      <SelectValue placeholder="All subjects" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All subjects</SelectItem>
+                      <SelectItem value="mathematics">Mathematics</SelectItem>
+                      <SelectItem value="physics">Physics</SelectItem>
+                      <SelectItem value="chemistry">Chemistry</SelectItem>
+                      <SelectItem value="biology">Biology</SelectItem>
+                      <SelectItem value="computer-science">Computer Science</SelectItem>
+                      <SelectItem value="english">English</SelectItem>
+                      <SelectItem value="history">History</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="search-difficulty">Difficulty</Label>
+                  <Select value={searchDifficulty} onValueChange={(val) => setSearchDifficulty(val === 'all' ? undefined : val as any)}>
+                    <SelectTrigger id="search-difficulty">
+                      <SelectValue placeholder="All levels" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All levels</SelectItem>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="search-category">Category</Label>
+                  <Select value={searchCategory} onValueChange={(val) => setSearchCategory(val === 'all' ? undefined : val as any)}>
+                    <SelectTrigger id="search-category">
+                      <SelectValue placeholder="All categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All categories</SelectItem>
+                      <SelectItem value="definition">Definition</SelectItem>
+                      <SelectItem value="formula">Formula</SelectItem>
+                      <SelectItem value="theorem">Theorem</SelectItem>
+                      <SelectItem value="principle">Principle</SelectItem>
+                      <SelectItem value="fact">Fact</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="min-importance">Min Importance</Label>
+                  <Input
+                    id="min-importance"
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder="0"
+                    value={minImportance ?? ''}
+                    onChange={(e) => setMinImportance(e.target.value ? Number(e.target.value) : undefined)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="max-importance">Max Importance</Label>
+                  <Input
+                    id="max-importance"
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder="100"
+                    value={maxImportance ?? ''}
+                    onChange={(e) => setMaxImportance(e.target.value ? Number(e.target.value) : undefined)}
+                  />
+                </div>
+
+                <div className="flex items-end">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSearchSubject(undefined);
+                      setSearchDifficulty(undefined);
+                      setSearchCategory(undefined);
+                      setMinImportance(undefined);
+                      setMaxImportance(undefined);
+                    }}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Clear Filters
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Search Results */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">
+                    {searchResults ? `${searchResults.total} concepts found` : 'Search results will appear here'}
+                  </h3>
+                  {searchResults && searchResults.hasMore && (
+                    <Badge variant="secondary">Showing first 50 results</Badge>
+                  )}
+                </div>
+
+                <ScrollArea className="h-[600px] pr-4">
+                  {searchLoading ? (
+                    <div className="flex items-center justify-center h-40">
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : searchResults && searchResults.concepts.length > 0 ? (
+                    <div className="space-y-4">
+                      {searchResults.concepts.map((concept) => (
+                        <Card key={concept.id} className="border-l-4" style={{ borderLeftColor: `hsl(${(concept.importanceScore || 50) * 1.2}, 70%, 50%)` }}>
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-center gap-2">
+                                <span className="text-2xl">{getCategoryIcon(concept.category || "")}</span>
+                                <div>
+                                  <CardTitle className="text-lg">{concept.conceptName}</CardTitle>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Badge variant="secondary" className="text-xs">
+                                      {concept.difficulty || 'intermediate'}
+                                    </Badge>
+                                    <Badge variant="outline" className="text-xs">
+                                      {concept.category || 'concept'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end gap-1">
+                                <div className="flex items-center gap-1">
+                                  <Sparkles className="h-4 w-4 text-yellow-500" />
+                                  <span className="text-sm font-semibold">{concept.importanceScore || 50}/100</span>
+                                </div>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            <div>
+                              <h4 className="text-sm font-semibold text-muted-foreground mb-1">Definition</h4>
+                              <p className="text-sm">{concept.definition}</p>
+                            </div>
+                            {concept.explanation && (
+                              <div>
+                                <h4 className="text-sm font-semibold text-muted-foreground mb-1">Explanation</h4>
+                                <p className="text-sm text-muted-foreground">{concept.explanation}</p>
+                              </div>
+                            )}
+                            {concept.examples && Array.isArray(concept.examples) && concept.examples.length > 0 && (
+                              <div>
+                                <h4 className="text-sm font-semibold text-muted-foreground mb-1">Examples</h4>
+                                <ul className="list-disc list-inside space-y-1">
+                                  {concept.examples.map((example, idx) => (
+                                    <li key={idx} className="text-sm text-muted-foreground">{example}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {concept.keywords && Array.isArray(concept.keywords) && concept.keywords.length > 0 && (
+                              <div>
+                                <h4 className="text-sm font-semibold text-muted-foreground mb-1">Keywords</h4>
+                                <div className="flex flex-wrap gap-1">
+                                  {concept.keywords.map((keyword, idx) => (
+                                    <Badge key={idx} variant="outline" className="text-xs">
+                                      {keyword}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : searchResults ? (
+                    <div className="flex flex-col items-center justify-center h-40 text-center">
+                      <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                      <p className="text-muted-foreground">No concepts found</p>
+                      <p className="text-xs text-muted-foreground mt-1">Try adjusting your search filters</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-40 text-center">
+                      <Filter className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                      <p className="text-muted-foreground">Enter a search query or apply filters</p>
+                      <p className="text-xs text-muted-foreground mt-1">Then click the search button to find concepts</p>
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

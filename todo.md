@@ -2103,3 +2103,14 @@
 - [x] Add export to Anki button in concept extraction UI
 - [x] Include spaced repetition metadata in Anki cards
 - [x] Write vitest tests for batch upload and Anki export
+
+
+## Phase 41: Auto-Extraction & Concept Search (COMPLETED ✅)
+- [x] Implement auto-extraction after batch upload completion
+- [x] Add background processing for parallel concept extraction
+- [x] Create searchConcepts tRPC procedure with full-text search
+- [x] Add filters for subject, difficulty, importance score, category
+- [x] Build search UI with filter sidebar
+- [x] Display search results with highlighting
+- [x] Add pagination for large result sets
+- [x] Write vitest tests for auto-extraction and search (28/28 passing)

@@ -4,10 +4,152 @@ import { router, protectedProcedure } from "../_core/trpc";
 import { invokeLLM } from "../_core/llm";
 import { getDb } from "../db";
 import { studyMaterials, extractedConcepts, conceptRelationships, conceptNotes } from "../../drizzle/schema.js";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, like, or, gte, lte, inArray } from "drizzle-orm";
 import { storagePut } from "../storage";
 import { extractTextFromFile } from "../utils/ocr";
 import { generateAnkiDeck, type ConceptCard } from "../utils/ankiExport";
+
+/**
+ * Helper function to extract concepts from material (used for auto-extraction)
+ */
+async function extractConceptsFromMaterial(materialId: number, userId: number, textContent: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    // Update status to processing
+    await db.update(studyMaterials)
+      .set({ processingStatus: 'processing' })
+      .where(eq(studyMaterials.id, materialId));
+
+    // Call LLM to extract concepts
+    const response = await invokeLLM({
+      messages: [
+        {
+          role: 'system',
+          content: `You are an expert educational content analyzer. Extract key concepts from study materials and identify relationships between them.`
+        },
+        {
+          role: 'user',
+          content: `Analyze the following study material and extract all important concepts. For each concept, provide:
+1. Concept name (concise, 2-5 words)
+2. Definition (clear, 1-2 sentences)
+3. Explanation (detailed, 2-3 sentences)
+4. Examples (2-3 practical examples as an array)
+5. Category (one of: definition, formula, theorem, principle, fact)
+6. Importance score (0-100, how critical is this concept)
+7. Difficulty level (beginner, intermediate, advanced)
+8. Keywords (5-10 related search terms as an array)
+9. Relationships to other concepts (prerequisite, related, opposite, example_of, part_of)
+
+Study Material:
+${textContent}
+
+Return a JSON object with:
+- concepts: array of concept objects
+- relationships: array of { fromConcept, toConcept, type, description }`
+        }
+      ],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'concept_extraction',
+          strict: true,
+          schema: {
+            type: 'object',
+            properties: {
+              concepts: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    definition: { type: 'string' },
+                    explanation: { type: 'string' },
+                    examples: { type: 'array', items: { type: 'string' } },
+                    category: { type: 'string', enum: ['definition', 'formula', 'theorem', 'principle', 'fact'] },
+                    importanceScore: { type: 'number' },
+                    difficulty: { type: 'string', enum: ['beginner', 'intermediate', 'advanced'] },
+                    keywords: { type: 'array', items: { type: 'string' } }
+                  },
+                  required: ['name', 'definition', 'explanation', 'examples', 'category', 'importanceScore', 'difficulty', 'keywords'],
+                  additionalProperties: false
+                }
+              },
+              relationships: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    fromConcept: { type: 'string' },
+                    toConcept: { type: 'string' },
+                    type: { type: 'string', enum: ['prerequisite', 'related', 'opposite', 'example_of', 'part_of'] },
+                    description: { type: 'string' }
+                  },
+                  required: ['fromConcept', 'toConcept', 'type'],
+                  additionalProperties: false
+                }
+              }
+            },
+            required: ['concepts', 'relationships'],
+            additionalProperties: false
+          }
+        }
+      }
+    });
+
+    const content = response.choices[0].message.content;
+    const result = JSON.parse(typeof content === 'string' ? content : '{}');
+    const concepts = result.concepts || [];
+    const relationships = result.relationships || [];
+
+    // Insert concepts
+    const conceptMap = new Map<string, number>();
+    for (const concept of concepts) {
+      const [inserted] = await db.insert(extractedConcepts).values({
+        materialId,
+        conceptName: concept.name,
+        definition: concept.definition,
+        explanation: concept.explanation,
+        examples: concept.examples,
+        category: concept.category,
+        importanceScore: Math.min(100, Math.max(0, concept.importanceScore)),
+        difficulty: concept.difficulty,
+        keywords: concept.keywords,
+      });
+      conceptMap.set(concept.name, inserted.insertId);
+    }
+
+    // Insert relationships
+    for (const rel of relationships) {
+      const fromId = conceptMap.get(rel.fromConcept);
+      const toId = conceptMap.get(rel.toConcept);
+      if (fromId && toId) {
+        await db.insert(conceptRelationships).values({
+          conceptId: fromId,
+          relatedConceptId: toId,
+          relationshipType: rel.type,
+          description: rel.description,
+        });
+      }
+    }
+
+    // Update material status
+    await db.update(studyMaterials)
+      .set({
+        processingStatus: 'completed',
+        conceptCount: concepts.length,
+        processedAt: new Date(),
+      })
+      .where(eq(studyMaterials.id, materialId));
+
+  } catch (error) {
+    console.error('Concept extraction error:', error);
+    await db.update(studyMaterials)
+      .set({ processingStatus: 'failed' })
+      .where(eq(studyMaterials.id, materialId));
+  }
+}
 
 /**
  * AI-Powered Concept Extraction Router
@@ -558,6 +700,11 @@ Please extract all important concepts and their relationships.`,
               status: 'success',
               extractedTextLength: text.length,
             });
+
+            // Auto-extract concepts in background (don't wait for completion)
+            extractConceptsFromMaterial(material.insertId, ctx.user.id, text).catch(err => {
+              console.error(`Auto-extraction failed for material ${material.insertId}:`, err);
+            });
           } catch (error) {
             errors.push({
               fileName: file.fileName,
@@ -575,6 +722,108 @@ Please extract all important concepts and their relationships.`,
         results,
         errors,
         message: `Processed ${results.length}/${input.files.length} files successfully`,
+      };
+    }),
+
+  /**
+   * Search concepts across all user materials with filters
+   */
+  searchConcepts: protectedProcedure
+    .input(z.object({
+      query: z.string().optional(),
+      subject: z.string().optional(),
+      difficulty: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+      category: z.enum(['definition', 'formula', 'theorem', 'principle', 'fact']).optional(),
+      minImportance: z.number().min(0).max(100).optional(),
+      maxImportance: z.number().min(0).max(100).optional(),
+      limit: z.number().min(1).max(100).default(50),
+      offset: z.number().min(0).default(0),
+    }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+
+      // Build where conditions
+      const conditions = [];
+
+      // Filter by user's materials
+      const userMaterialIds = await db.select({ id: studyMaterials.id })
+        .from(studyMaterials)
+        .where(eq(studyMaterials.userId, ctx.user.id));
+      
+      const materialIds = userMaterialIds.map(m => m.id);
+      if (materialIds.length === 0) {
+        return { concepts: [], total: 0 };
+      }
+
+      conditions.push(inArray(extractedConcepts.materialId, materialIds));
+
+      // Text search across concept name, definition, explanation
+      if (input.query && input.query.trim().length > 0) {
+        const searchTerm = `%${input.query.trim()}%`;
+        conditions.push(
+          or(
+            like(extractedConcepts.conceptName, searchTerm),
+            like(extractedConcepts.definition, searchTerm),
+            like(extractedConcepts.explanation, searchTerm)
+          )!
+        );
+      }
+
+      // Filter by difficulty
+      if (input.difficulty) {
+        conditions.push(eq(extractedConcepts.difficulty, input.difficulty));
+      }
+
+      // Filter by category
+      if (input.category) {
+        conditions.push(eq(extractedConcepts.category, input.category));
+      }
+
+      // Filter by importance score range
+      if (input.minImportance !== undefined) {
+        conditions.push(gte(extractedConcepts.importanceScore, input.minImportance));
+      }
+      if (input.maxImportance !== undefined) {
+        conditions.push(lte(extractedConcepts.importanceScore, input.maxImportance));
+      }
+
+      // Filter by subject (join with materials)
+      if (input.subject) {
+        const materialsWithSubject = await db.select({ id: studyMaterials.id })
+          .from(studyMaterials)
+          .where(and(
+            eq(studyMaterials.userId, ctx.user.id),
+            eq(studyMaterials.subject, input.subject)
+          ));
+        
+        const subjectMaterialIds = materialsWithSubject.map(m => m.id);
+        if (subjectMaterialIds.length > 0) {
+          conditions.push(inArray(extractedConcepts.materialId, subjectMaterialIds));
+        } else {
+          return { concepts: [], total: 0 };
+        }
+      }
+
+      // Get total count
+      const totalResult = await db.select()
+        .from(extractedConcepts)
+        .where(and(...conditions));
+      
+      const total = totalResult.length;
+
+      // Get paginated results
+      const concepts = await db.select()
+        .from(extractedConcepts)
+        .where(and(...conditions))
+        .orderBy(desc(extractedConcepts.importanceScore))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      return {
+        concepts,
+        total,
+        hasMore: total > input.offset + input.limit,
       };
     }),
 

@@ -598,6 +598,63 @@ export const reviewSessions = mysqlTable("review_sessions", {
 export type ReviewSession = typeof reviewSessions.$inferSelect;
 
 /**
+ * AI Roleplay scenarios
+ */
+export const roleplayScenarios = mysqlTable("roleplay_scenarios", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  type: mysqlEnum("type", ["debate", "interview", "experiment", "presentation", "discussion"]).notNull(),
+  difficulty: mysqlEnum("difficulty", ["beginner", "intermediate", "advanced"]).notNull(),
+  subjectId: int("subjectId"),
+  topicId: int("topicId"),
+  characterRole: varchar("characterRole", { length: 255 }), // e.g., "Interviewer", "Debate Opponent"
+  systemPrompt: text("systemPrompt").notNull(),
+  objectives: json("objectives").$type<string[]>(),
+  estimatedDuration: int("estimatedDuration"), // in minutes
+  active: boolean("active").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type RoleplayScenario = typeof roleplayScenarios.$inferSelect;
+
+/**
+ * AI Roleplay sessions
+ */
+export const roleplaySessions = mysqlTable("roleplay_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull(),
+  scenarioId: int("scenarioId").notNull(),
+  status: mysqlEnum("status", ["active", "completed", "abandoned"]).default("active"),
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+  durationSeconds: int("durationSeconds"),
+  performanceScore: int("performanceScore"), // 0-100
+  feedback: text("feedback"),
+  metadata: json("metadata"),
+}, (table) => ({
+  studentIdx: index("student_idx").on(table.studentUserId),
+  scenarioIdx: index("scenario_idx").on(table.scenarioId),
+}));
+
+export type RoleplaySession = typeof roleplaySessions.$inferSelect;
+
+/**
+ * Roleplay conversation messages
+ */
+export const roleplayMessages = mysqlTable("roleplay_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionId: int("sessionId").notNull(),
+  role: mysqlEnum("role", ["user", "assistant", "system"]).notNull(),
+  content: text("content").notNull(),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+}, (table) => ({
+  sessionIdx: index("session_idx").on(table.sessionId),
+}));
+
+export type RoleplayMessage = typeof roleplayMessages.$inferSelect;
+
+/**
  * Learning activity logs
  */
 export const activityLogs = mysqlTable("activity_logs", {

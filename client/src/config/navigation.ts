@@ -25,6 +25,7 @@ import {
   BookMarked,
   Baby,
   DollarSign,
+  Brain,
 } from "lucide-react";
 
 export interface NavItem {
@@ -60,6 +61,7 @@ export const studentNavigation: NavSection[] = [
     items: [
       { label: "AI Tutor", icon: Bot, path: "/ai-tutor-avatar" },
       { label: "Chat Tutor", icon: MessageSquare, path: "/chat-tutor" },
+      { label: "Concept Extraction", icon: Brain, path: "/concept-extraction" },
     ],
   },
   {

@@ -71,6 +71,7 @@ import Favorites from "./pages/Favorites";
 import Recommendations from "./pages/Recommendations";
 import Messages from "./pages/Messages";
 import ProfileSettings from "./pages/ProfileSettings";
+import ConceptExtraction from "./pages/ConceptExtraction";
 import { useAuth } from "./_core/hooks/useAuth";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
@@ -236,6 +237,12 @@ function Router() {
       <Route path="/parent-teacher-meeting">
         <ProtectedRoute>
           <ParentTeacherMeeting />
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/concept-extraction">
+        <ProtectedRoute>
+          <ConceptExtraction />
         </ProtectedRoute>
       </Route>
       

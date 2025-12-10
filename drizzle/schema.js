@@ -1,25 +1,49 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, index, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, index, uniqueIndex, json, decimal } from "drizzle-orm/mysql-core";
 /**
  * Core user table with multi-role support
  */
-export var users = mysqlTable("users", {
+export const users = mysqlTable("users", {
     id: int("id").autoincrement().primaryKey(),
     openId: varchar("openId", { length: 64 }).notNull().unique(),
     name: text("name"),
     email: varchar("email", { length: 320 }),
+    mobile: varchar("mobile", { length: 20 }),
     loginMethod: varchar("loginMethod", { length: 64 }),
-    role: mysqlEnum("role", ["student", "parent", "teacher", "admin", "institution_admin"]).default("student").notNull(),
+    role: mysqlEnum("role", ["student", "parent", "teacher", "admin", "institution_admin", "branch_admin", "super_admin"]).default("student").notNull(),
     institutionId: int("institutionId"),
+    organizationId: int("organizationId"),
+    branchId: int("branchId"),
+    // Authentication fields
+    passwordHash: varchar("passwordHash", { length: 255 }),
+    emailVerified: boolean("emailVerified").default(false),
+    otpCode: varchar("otpCode", { length: 6 }),
+    otpExpiry: timestamp("otpExpiry"),
+    resetToken: varchar("resetToken", { length: 255 }),
+    resetTokenExpiry: timestamp("resetTokenExpiry"),
+    failedLoginAttempts: int("failedLoginAttempts").default(0),
+    lockedUntil: timestamp("lockedUntil"),
+    googleId: varchar("googleId", { length: 255 }),
+    facebookId: varchar("facebookId", { length: 255 }),
+    gdprConsent: boolean("gdprConsent").default(false),
+    gdprConsentDate: timestamp("gdprConsentDate"),
+    dataResidency: varchar("dataResidency", { length: 50 }),
+    // Stripe integration
+    stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+    // Profile
+    profilePhotoUrl: text("profilePhotoUrl"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
     lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     institutionIdx: index("institution_idx").on(table.institutionId),
-}); });
+    organizationIdx: index("organization_idx").on(table.organizationId),
+    branchIdx: index("branch_idx").on(table.branchId),
+    emailIdx: index("email_idx").on(table.email),
+}));
 /**
  * Student profiles with learning goals and preferences
  */
-export var studentProfiles = mysqlTable("student_profiles", {
+export const studentProfiles = mysqlTable("student_profiles", {
     id: int("id").autoincrement().primaryKey(),
     userId: int("userId").notNull(),
     country: varchar("country", { length: 100 }),
@@ -35,26 +59,26 @@ export var studentProfiles = mysqlTable("student_profiles", {
     studyHoursPerDay: int("studyHoursPerDay"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     userIdx: index("user_idx").on(table.userId),
-}); });
+}));
 /**
  * Parent-student relationships
  */
-export var parentStudentLinks = mysqlTable("parent_student_links", {
+export const parentStudentLinks = mysqlTable("parent_student_links", {
     id: int("id").autoincrement().primaryKey(),
     parentUserId: int("parentUserId").notNull(),
     studentUserId: int("studentUserId").notNull(),
     relationship: varchar("relationship", { length: 50 }), // mother, father, guardian
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     parentIdx: index("parent_idx").on(table.parentUserId),
     studentIdx: index("student_idx").on(table.studentUserId),
-}); });
+}));
 /**
  * Institutions (schools, coaching centers)
  */
-export var institutions = mysqlTable("institutions", {
+export const institutions = mysqlTable("institutions", {
     id: int("id").autoincrement().primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
     type: mysqlEnum("type", ["school", "coaching_center", "university", "other"]),
@@ -73,7 +97,7 @@ export var institutions = mysqlTable("institutions", {
 /**
  * Curriculum structure: subjects
  */
-export var subjects = mysqlTable("subjects", {
+export const subjects = mysqlTable("subjects", {
     id: int("id").autoincrement().primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
     curriculum: varchar("curriculum", { length: 100 }).notNull(),
@@ -82,26 +106,26 @@ export var subjects = mysqlTable("subjects", {
     iconUrl: text("iconUrl"),
     displayOrder: int("displayOrder").default(0),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     curriculumIdx: index("curriculum_idx").on(table.curriculum, table.grade),
-}); });
+}));
 /**
  * Curriculum structure: units within subjects
  */
-export var units = mysqlTable("units", {
+export const units = mysqlTable("units", {
     id: int("id").autoincrement().primaryKey(),
     subjectId: int("subjectId").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     description: text("description"),
     displayOrder: int("displayOrder").default(0),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     subjectIdx: index("subject_idx").on(table.subjectId),
-}); });
+}));
 /**
  * Curriculum structure: topics within units
  */
-export var topics = mysqlTable("topics", {
+export const topics = mysqlTable("topics", {
     id: int("id").autoincrement().primaryKey(),
     unitId: int("unitId").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
@@ -111,13 +135,13 @@ export var topics = mysqlTable("topics", {
     estimatedMinutes: int("estimatedMinutes"),
     displayOrder: int("displayOrder").default(0),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     unitIdx: index("unit_idx").on(table.unitId),
-}); });
+}));
 /**
  * Learning content items
  */
-export var contentItems = mysqlTable("content_items", {
+export const contentItems = mysqlTable("content_items", {
     id: int("id").autoincrement().primaryKey(),
     topicId: int("topicId").notNull(),
     type: mysqlEnum("type", ["note", "video", "slide", "simulation", "question", "past_paper"]).notNull(),
@@ -136,14 +160,14 @@ export var contentItems = mysqlTable("content_items", {
     version: int("version").default(1),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     topicIdx: index("topic_idx").on(table.topicId),
     statusIdx: index("status_idx").on(table.status),
-}); });
+}));
 /**
  * Questions for assessments
  */
-export var questions = mysqlTable("questions", {
+export const questions = mysqlTable("questions", {
     id: int("id").autoincrement().primaryKey(),
     topicId: int("topicId").notNull(),
     type: mysqlEnum("type", ["mcq", "msq", "numeric", "short_answer", "long_answer", "essay", "drag_drop", "match_pairs", "fill_blank"]).notNull(),
@@ -163,14 +187,14 @@ export var questions = mysqlTable("questions", {
     status: mysqlEnum("status", ["draft", "review", "approved", "live"]).default("draft"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     topicIdx: index("topic_idx").on(table.topicId),
     statusIdx: index("status_idx").on(table.status),
-}); });
+}));
 /**
  * Study plans for students
  */
-export var studyPlans = mysqlTable("study_plans", {
+export const studyPlans = mysqlTable("study_plans", {
     id: int("id").autoincrement().primaryKey(),
     studentUserId: int("studentUserId").notNull(),
     name: varchar("name", { length: 255 }).notNull(),
@@ -184,13 +208,13 @@ export var studyPlans = mysqlTable("study_plans", {
     active: boolean("active").default(true),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     studentIdx: index("student_idx").on(table.studentUserId),
-}); });
+}));
 /**
  * Knowledge profile: tracks student mastery per topic
  */
-export var knowledgeProfiles = mysqlTable("knowledge_profiles", {
+export const knowledgeProfiles = mysqlTable("knowledge_profiles", {
     id: int("id").autoincrement().primaryKey(),
     studentUserId: int("studentUserId").notNull(),
     topicId: int("topicId").notNull(),
@@ -204,13 +228,13 @@ export var knowledgeProfiles = mysqlTable("knowledge_profiles", {
     misconceptions: json("misconceptions").$type(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     studentTopicIdx: index("student_topic_idx").on(table.studentUserId, table.topicId),
-}); });
+}));
 /**
  * Tests and assessments
  */
-export var tests = mysqlTable("tests", {
+export const tests = mysqlTable("tests", {
     id: int("id").autoincrement().primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
     description: text("description"),
@@ -231,27 +255,27 @@ export var tests = mysqlTable("tests", {
     status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     subjectIdx: index("subject_idx").on(table.subjectId),
     institutionIdx: index("institution_idx").on(table.institutionId),
-}); });
+}));
 /**
  * Test-question relationships
  */
-export var testQuestions = mysqlTable("test_questions", {
+export const testQuestions = mysqlTable("test_questions", {
     id: int("id").autoincrement().primaryKey(),
     testId: int("testId").notNull(),
     questionId: int("questionId").notNull(),
     displayOrder: int("displayOrder").default(0),
     marks: int("marks"),
     section: varchar("section", { length: 100 }),
-}, function (table) { return ({
+}, (table) => ({
     testIdx: index("test_idx").on(table.testId),
-}); });
+}));
 /**
  * Test attempts by students
  */
-export var testAttempts = mysqlTable("test_attempts", {
+export const testAttempts = mysqlTable("test_attempts", {
     id: int("id").autoincrement().primaryKey(),
     testId: int("testId").notNull(),
     studentUserId: int("studentUserId").notNull(),
@@ -265,13 +289,13 @@ export var testAttempts = mysqlTable("test_attempts", {
     status: mysqlEnum("status", ["in_progress", "submitted", "evaluated", "abandoned"]).default("in_progress"),
     answers: json("answers").$type(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     testStudentIdx: index("test_student_idx").on(table.testId, table.studentUserId),
-}); });
+}));
 /**
  * AI tutor conversation sessions
  */
-export var tutorSessions = mysqlTable("tutor_sessions", {
+export const tutorSessions = mysqlTable("tutor_sessions", {
     id: int("id").autoincrement().primaryKey(),
     studentUserId: int("studentUserId").notNull(),
     mode: mysqlEnum("mode", ["teaching", "practice", "exam", "revision"]).default("teaching"),
@@ -280,13 +304,13 @@ export var tutorSessions = mysqlTable("tutor_sessions", {
     endedAt: timestamp("endedAt"),
     messageCount: int("messageCount").default(0),
     active: boolean("active").default(true),
-}, function (table) { return ({
+}, (table) => ({
     studentIdx: index("student_idx").on(table.studentUserId),
-}); });
+}));
 /**
  * Messages within tutor sessions
  */
-export var tutorMessages = mysqlTable("tutor_messages", {
+export const tutorMessages = mysqlTable("tutor_messages", {
     id: int("id").autoincrement().primaryKey(),
     sessionId: int("sessionId").notNull(),
     role: mysqlEnum("role", ["user", "assistant", "system"]).notNull(),
@@ -295,13 +319,13 @@ export var tutorMessages = mysqlTable("tutor_messages", {
     audioUrl: text("audioUrl"),
     metadata: json("metadata").$type(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     sessionIdx: index("session_idx").on(table.sessionId),
-}); });
+}));
 /**
  * Doubts posted by students
  */
-export var doubts = mysqlTable("doubts", {
+export const doubts = mysqlTable("doubts", {
     id: int("id").autoincrement().primaryKey(),
     studentUserId: int("studentUserId").notNull(),
     topicId: int("topicId"),
@@ -317,14 +341,14 @@ export var doubts = mysqlTable("doubts", {
     assignedTeacherId: int("assignedTeacherId"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     resolvedAt: timestamp("resolvedAt"),
-}, function (table) { return ({
+}, (table) => ({
     studentIdx: index("student_idx").on(table.studentUserId),
     topicIdx: index("topic_idx").on(table.topicId),
-}); });
+}));
 /**
  * Gamification: achievements and badges
  */
-export var achievements = mysqlTable("achievements", {
+export const achievements = mysqlTable("achievements", {
     id: int("id").autoincrement().primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
     description: text("description"),
@@ -337,18 +361,18 @@ export var achievements = mysqlTable("achievements", {
 /**
  * Student achievements
  */
-export var studentAchievements = mysqlTable("student_achievements", {
+export const studentAchievements = mysqlTable("student_achievements", {
     id: int("id").autoincrement().primaryKey(),
     studentUserId: int("studentUserId").notNull(),
     achievementId: int("achievementId").notNull(),
     earnedAt: timestamp("earnedAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     studentIdx: index("student_idx").on(table.studentUserId),
-}); });
+}));
 /**
  * Gamification: student points and levels
  */
-export var studentGameStats = mysqlTable("student_game_stats", {
+export const studentGameStats = mysqlTable("student_game_stats", {
     id: int("id").autoincrement().primaryKey(),
     studentUserId: int("studentUserId").notNull().unique(),
     totalPoints: int("totalPoints").default(0),
@@ -360,9 +384,186 @@ export var studentGameStats = mysqlTable("student_game_stats", {
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 /**
+ * Streak freeze tracking (Duolingo-style)
+ */
+export const streakFreezes = mysqlTable("streak_freezes", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull(),
+    usedAt: timestamp("usedAt").defaultNow().notNull(),
+    reason: varchar("reason", { length: 255 }), // optional: why they used it
+}, (table) => ({
+    studentIdx: index("freeze_student_idx").on(table.studentUserId),
+}));
+/**
+ * Virtual currency for gamification (coins/gems)
+ */
+export const studentCurrency = mysqlTable("student_currency", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull().unique(),
+    coins: int("coins").default(0).notNull(),
+    gems: int("gems").default(0).notNull(), // premium currency
+    totalEarned: int("totalEarned").default(0).notNull(),
+    totalSpent: int("totalSpent").default(0).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+/**
+ * Currency transaction log
+ */
+export const currencyTransactions = mysqlTable("currency_transactions", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull(),
+    type: mysqlEnum("type", ["earn", "spend"]).notNull(),
+    currencyType: mysqlEnum("currency_type", ["coins", "gems"]).notNull(),
+    amount: int("amount").notNull(),
+    reason: varchar("reason", { length: 255 }).notNull(), // "Completed lesson", "Bought avatar item"
+    relatedId: int("relatedId"), // lesson_id, assessment_id, purchase_id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+    studentIdx: index("trans_student_idx").on(table.studentUserId),
+    createdIdx: index("trans_created_idx").on(table.createdAt),
+}));
+/**
+ * Leaderboards (class, school, global)
+ */
+export const leaderboards = mysqlTable("leaderboards", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull(),
+    scope: mysqlEnum("scope", ["class", "school", "global"]).notNull(),
+    scopeId: int("scopeId"), // class_id or institution_id (null for global)
+    period: mysqlEnum("period", ["daily", "weekly", "monthly", "all_time"]).notNull(),
+    points: int("points").default(0).notNull(),
+    rank: int("rank"),
+    periodStart: timestamp("periodStart").notNull(),
+    periodEnd: timestamp("periodEnd").notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    studentIdx: index("lead_student_idx").on(table.studentUserId),
+    scopeIdx: index("lead_scope_idx").on(table.scope, table.scopeId),
+    periodIdx: index("lead_period_idx").on(table.period),
+    rankIdx: index("lead_rank_idx").on(table.rank),
+}));
+/**
+ * Milestone celebrations (10%, 25%, 50%, 75%, 100% completion)
+ */
+export const milestones = mysqlTable("milestones", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull(),
+    milestoneType: varchar("milestoneType", { length: 100 }).notNull(), // "syllabus_completion", "streak_milestone", "assessment_perfect"
+    percentage: int("percentage"), // 10, 25, 50, 75, 100
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    rewardCoins: int("rewardCoins").default(0),
+    rewardGems: int("rewardGems").default(0),
+    celebrated: boolean("celebrated").default(false), // has user seen the celebration animation?
+    achievedAt: timestamp("achievedAt").defaultNow().notNull(),
+}, (table) => ({
+    studentIdx: index("milestone_student_idx").on(table.studentUserId),
+    typeIdx: index("milestone_type_idx").on(table.milestoneType),
+}));
+/**
+ * Spaced Repetition System - Review schedules based on Ebbinghaus forgetting curve
+ */
+export const reviewSchedules = mysqlTable("review_schedules", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull(),
+    topicId: int("topicId"),
+    conceptId: int("conceptId"),
+    questionId: int("questionId"),
+    contentType: mysqlEnum("contentType", ["topic", "concept", "question"]).notNull(),
+    // Spaced repetition algorithm fields
+    easeFactor: decimal("easeFactor", { precision: 3, scale: 2 }).default("2.50").notNull(), // 1.3-2.5+
+    interval: int("interval").default(1).notNull(), // Days until next review
+    repetitions: int("repetitions").default(0).notNull(), // Number of successful reviews
+    // Review timing
+    lastReviewedAt: timestamp("lastReviewedAt"),
+    nextReviewAt: timestamp("nextReviewAt").notNull(),
+    dueStatus: mysqlEnum("dueStatus", ["not_due", "due_soon", "due_now", "overdue"]).default("not_due").notNull(),
+    // Performance tracking
+    totalReviews: int("totalReviews").default(0),
+    successfulReviews: int("successfulReviews").default(0),
+    averageScore: int("averageScore"), // 0-100
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    studentIdx: index("student_idx").on(table.studentUserId),
+    nextReviewIdx: index("next_review_idx").on(table.nextReviewAt),
+    dueStatusIdx: index("due_status_idx").on(table.dueStatus),
+}));
+/**
+ * Review session history
+ */
+export const reviewSessions = mysqlTable("review_sessions", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull(),
+    scheduleId: int("scheduleId").notNull(),
+    // Session details
+    score: int("score").notNull(), // 0-100
+    timeSpentSeconds: int("timeSpentSeconds"),
+    difficulty: mysqlEnum("difficulty", ["again", "hard", "good", "easy"]).notNull(),
+    // Algorithm updates
+    oldInterval: int("oldInterval"),
+    newInterval: int("newInterval"),
+    oldEaseFactor: decimal("oldEaseFactor", { precision: 3, scale: 2 }),
+    newEaseFactor: decimal("newEaseFactor", { precision: 3, scale: 2 }),
+    reviewedAt: timestamp("reviewedAt").defaultNow().notNull(),
+}, (table) => ({
+    studentIdx: index("student_idx").on(table.studentUserId),
+    scheduleIdx: index("schedule_idx").on(table.scheduleId),
+    dateIdx: index("date_idx").on(table.reviewedAt),
+}));
+/**
+ * AI Roleplay scenarios
+ */
+export const roleplayScenarios = mysqlTable("roleplay_scenarios", {
+    id: int("id").autoincrement().primaryKey(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    type: mysqlEnum("type", ["debate", "interview", "experiment", "presentation", "discussion"]).notNull(),
+    difficulty: mysqlEnum("difficulty", ["beginner", "intermediate", "advanced"]).notNull(),
+    subjectId: int("subjectId"),
+    topicId: int("topicId"),
+    characterRole: varchar("characterRole", { length: 255 }), // e.g., "Interviewer", "Debate Opponent"
+    systemPrompt: text("systemPrompt").notNull(),
+    objectives: json("objectives").$type(),
+    estimatedDuration: int("estimatedDuration"), // in minutes
+    active: boolean("active").default(true),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+/**
+ * AI Roleplay sessions
+ */
+export const roleplaySessions = mysqlTable("roleplay_sessions", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull(),
+    scenarioId: int("scenarioId").notNull(),
+    status: mysqlEnum("status", ["active", "completed", "abandoned"]).default("active"),
+    startedAt: timestamp("startedAt").defaultNow().notNull(),
+    completedAt: timestamp("completedAt"),
+    durationSeconds: int("durationSeconds"),
+    performanceScore: int("performanceScore"), // 0-100
+    feedback: text("feedback"),
+    metadata: json("metadata"),
+}, (table) => ({
+    studentIdx: index("student_idx").on(table.studentUserId),
+    scenarioIdx: index("scenario_idx").on(table.scenarioId),
+}));
+/**
+ * Roleplay conversation messages
+ */
+export const roleplayMessages = mysqlTable("roleplay_messages", {
+    id: int("id").autoincrement().primaryKey(),
+    sessionId: int("sessionId").notNull(),
+    role: mysqlEnum("role", ["user", "assistant", "system"]).notNull(),
+    content: text("content").notNull(),
+    timestamp: timestamp("timestamp").defaultNow().notNull(),
+}, (table) => ({
+    sessionIdx: index("session_idx").on(table.sessionId),
+}));
+/**
  * Learning activity logs
  */
-export var activityLogs = mysqlTable("activity_logs", {
+export const activityLogs = mysqlTable("activity_logs", {
     id: int("id").autoincrement().primaryKey(),
     userId: int("userId").notNull(),
     activityType: varchar("activityType", { length: 100 }).notNull(), // study, practice, test, tutor_chat
@@ -372,14 +573,14 @@ export var activityLogs = mysqlTable("activity_logs", {
     pointsEarned: int("pointsEarned").default(0),
     metadata: json("metadata"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     userIdx: index("user_idx").on(table.userId),
     dateIdx: index("date_idx").on(table.createdAt),
-}); });
+}));
 /**
  * Subscription plans
  */
-export var subscriptionPlans = mysqlTable("subscription_plans", {
+export const subscriptionPlans = mysqlTable("subscription_plans", {
     id: int("id").autoincrement().primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
     description: text("description"),
@@ -395,41 +596,56 @@ export var subscriptionPlans = mysqlTable("subscription_plans", {
 /**
  * User subscriptions
  */
-export var subscriptions = mysqlTable("subscriptions", {
+export const subscriptions = mysqlTable("subscriptions", {
     id: int("id").autoincrement().primaryKey(),
     userId: int("userId").notNull(),
-    planId: int("planId").notNull(),
-    status: mysqlEnum("status", ["active", "cancelled", "expired", "trial"]).default("active"),
-    startDate: timestamp("startDate").defaultNow().notNull(),
-    endDate: timestamp("endDate").notNull(),
+    planId: int("planId"),
+    // Stripe integration fields
+    stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }).unique(),
+    stripePriceId: varchar("stripePriceId", { length: 255 }),
+    planType: varchar("planType", { length: 100 }), // INSTITUTION_BASIC_MONTHLY, PARENT_MONTHLY, etc.
+    status: mysqlEnum("status", ["active", "cancelled", "expired", "trial", "canceled", "past_due", "trialing", "incomplete"]).default("active"),
+    startDate: timestamp("startDate").defaultNow(),
+    endDate: timestamp("endDate"),
+    currentPeriodEnd: timestamp("currentPeriodEnd"),
+    cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false),
+    trialEnd: timestamp("trialEnd"),
     autoRenew: boolean("autoRenew").default(true),
     paymentMethod: varchar("paymentMethod", { length: 100 }),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     userIdx: index("user_idx").on(table.userId),
-}); });
+    stripeSubscriptionIdx: index("stripe_subscription_idx").on(table.stripeSubscriptionId),
+}));
 /**
  * Payment transactions
  */
-export var payments = mysqlTable("payments", {
+export const payments = mysqlTable("payments", {
     id: int("id").autoincrement().primaryKey(),
     userId: int("userId").notNull(),
     subscriptionId: int("subscriptionId"),
+    // Stripe integration fields
+    stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }).unique(),
+    stripeInvoiceId: varchar("stripeInvoiceId", { length: 255 }),
+    productType: varchar("productType", { length: 100 }), // COURSE_JEE_MAIN, etc.
     amount: int("amount").notNull(), // in cents
     currency: varchar("currency", { length: 10 }).default("USD"),
-    status: mysqlEnum("status", ["pending", "completed", "failed", "refunded"]).default("pending"),
+    status: mysqlEnum("status", ["pending", "completed", "failed", "refunded", "succeeded"]).default("pending"),
     paymentMethod: varchar("paymentMethod", { length: 100 }),
     transactionId: varchar("transactionId", { length: 255 }),
     invoiceUrl: text("invoiceUrl"),
+    metadata: json("metadata").$type(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+}, (table) => ({
     userIdx: index("user_idx").on(table.userId),
-}); });
+    paymentIntentIdx: index("payment_intent_idx").on(table.stripePaymentIntentId),
+}));
 /**
  * Notifications for users
  */
-export var notifications = mysqlTable("notifications", {
+export const notifications = mysqlTable("notifications", {
     id: int("id").autoincrement().primaryKey(),
     userId: int("userId").notNull(),
     title: varchar("title", { length: 255 }).notNull(),
@@ -438,6 +654,369 @@ export var notifications = mysqlTable("notifications", {
     read: boolean("read").default(false),
     actionUrl: text("actionUrl"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, function (table) { return ({
+}, (table) => ({
     userIdx: index("user_idx").on(table.userId),
-}); });
+}));
+/**
+ * Classes for organizing students by grade/curriculum
+ */
+export const classes = mysqlTable("classes", {
+    id: int("id").autoincrement().primaryKey(),
+    organizationId: int("organizationId").notNull(),
+    branchId: int("branchId"),
+    name: varchar("name", { length: 100 }).notNull(),
+    curriculum: varchar("curriculum", { length: 100 }),
+    board: varchar("board", { length: 100 }),
+    academicYear: varchar("academicYear", { length: 20 }),
+    maxStudents: int("maxStudents").default(40),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    orgIdx: index("org_class_idx").on(table.organizationId),
+    branchIdx: index("branch_class_idx").on(table.branchId),
+}));
+/**
+ * Sections within classes
+ */
+export const sections = mysqlTable("sections", {
+    id: int("id").autoincrement().primaryKey(),
+    classId: int("classId").notNull(),
+    name: varchar("name", { length: 10 }).notNull(),
+    maxStudents: int("maxStudents").default(40),
+    currentStudents: int("currentStudents").default(0),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+    classIdx: index("section_class_idx").on(table.classId),
+}));
+/**
+ * Subject-teacher assignments
+ */
+export const classSubjects = mysqlTable("class_subjects", {
+    id: int("id").autoincrement().primaryKey(),
+    classId: int("classId").notNull(),
+    subjectId: int("subjectId").notNull(),
+    teacherUserId: int("teacherUserId"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+    classIdx: index("cs_class_idx").on(table.classId),
+    teacherIdx: index("cs_teacher_idx").on(table.teacherUserId),
+}));
+/**
+ * Student enrollments
+ */
+export const studentEnrollments = mysqlTable("student_enrollments", {
+    id: int("id").autoincrement().primaryKey(),
+    studentUserId: int("studentUserId").notNull(),
+    classId: int("classId").notNull(),
+    sectionId: int("sectionId"),
+    enrollmentDate: timestamp("enrollmentDate").defaultNow().notNull(),
+    status: mysqlEnum("status", ["active", "inactive", "graduated", "transferred"]).default("active").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+    studentIdx: index("enroll_student_idx").on(table.studentUserId),
+    classIdx: index("enroll_class_idx").on(table.classId),
+    sectionIdx: index("enroll_section_idx").on(table.sectionId),
+}));
+/**
+ * Organization subscriptions (enhanced)
+ */
+export const organizationSubscriptions = mysqlTable("organization_subscriptions", {
+    id: int("id").autoincrement().primaryKey(),
+    organizationId: int("organizationId").notNull(),
+    planId: int("planId").notNull(),
+    status: mysqlEnum("status", ["trial", "active", "past_due", "cancelled", "expired"]).default("trial").notNull(),
+    trialEndsAt: timestamp("trialEndsAt"),
+    currentPeriodStart: timestamp("currentPeriodStart").notNull(),
+    currentPeriodEnd: timestamp("currentPeriodEnd").notNull(),
+    cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false),
+    stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+    stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    orgIdx: index("org_sub_idx").on(table.organizationId),
+    planIdx: index("plan_sub_idx").on(table.planId),
+}));
+/**
+ * Subscription usage tracking
+ */
+export const subscriptionUsage = mysqlTable("subscription_usage", {
+    id: int("id").autoincrement().primaryKey(),
+    organizationId: int("organizationId").notNull(),
+    metricName: varchar("metricName", { length: 50 }).notNull(),
+    currentValue: int("currentValue").default(0),
+    limitValue: int("limitValue").notNull(),
+    periodStart: timestamp("periodStart").notNull(),
+    periodEnd: timestamp("periodEnd").notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    orgIdx: index("usage_org_idx").on(table.organizationId),
+    metricIdx: index("usage_metric_idx").on(table.metricName),
+}));
+/**
+ * Content sources for tracking scraped external resources
+ */
+export const contentSources = mysqlTable("content_sources", {
+    id: int("id").autoincrement().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(), // "NCERT", "CBSE", "JEE Main", etc.
+    sourceType: mysqlEnum("source_type", ["website", "pdf", "video", "api"]).notNull(),
+    baseUrl: text("baseUrl"),
+    scrapingConfig: json("scrapingConfig").$type(),
+    curriculum: varchar("curriculum", { length: 100 }), // CBSE, ICSE, JEE, NEET, etc.
+    subjects: json("subjects").$type(),
+    lastScrapedAt: timestamp("lastScrapedAt"),
+    nextScheduledScrape: timestamp("nextScheduledScrape"),
+    status: mysqlEnum("status", ["active", "paused", "error"]).default("active"),
+    errorMessage: text("errorMessage"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    curriculumIdx: index("source_curriculum_idx").on(table.curriculum),
+    statusIdx: index("source_status_idx").on(table.status),
+}));
+/**
+ * Content approval queue for admin review
+ */
+export const contentApprovalQueue = mysqlTable("content_approval_queue", {
+    id: int("id").autoincrement().primaryKey(),
+    sourceId: int("sourceId").notNull(),
+    contentType: mysqlEnum("content_type", ["note", "video", "slide", "simulation", "question", "past_paper"]).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    content: text("content"),
+    url: text("url"),
+    fileKey: text("fileKey"),
+    metadata: json("metadata").$type(),
+    autoCategorizationScore: int("autoCategorizationScore"), // 0-100 confidence
+    duplicateCheckStatus: mysqlEnum("duplicate_check_status", ["pending", "unique", "duplicate"]).default("pending"),
+    duplicateOfId: int("duplicateOfId"),
+    qualityScore: int("qualityScore"), // 0-100
+    status: mysqlEnum("status", ["pending", "approved", "rejected", "needs_review"]).default("pending"),
+    reviewedBy: int("reviewedBy"),
+    reviewedAt: timestamp("reviewedAt"),
+    rejectionReason: text("rejectionReason"),
+    approvedContentItemId: int("approvedContentItemId"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    sourceIdx: index("queue_source_idx").on(table.sourceId),
+    statusIdx: index("queue_status_idx").on(table.status),
+    reviewerIdx: index("queue_reviewer_idx").on(table.reviewedBy),
+}));
+/**
+ * Scraping logs for monitoring and debugging
+ */
+export const scrapingLogs = mysqlTable("scraping_logs", {
+    id: int("id").autoincrement().primaryKey(),
+    sourceId: int("sourceId").notNull(),
+    status: mysqlEnum("status", ["started", "success", "partial", "failed"]).notNull(),
+    itemsFound: int("itemsFound").default(0),
+    itemsAdded: int("itemsAdded").default(0),
+    itemsSkipped: int("itemsSkipped").default(0),
+    errorMessage: text("errorMessage"),
+    executionTimeSeconds: int("executionTimeSeconds"),
+    metadata: json("metadata").$type(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+    sourceIdx: index("log_source_idx").on(table.sourceId),
+    statusIdx: index("log_status_idx").on(table.status),
+    createdIdx: index("log_created_idx").on(table.createdAt),
+}));
+// Content Favorites (Bookmarks)
+export const contentFavorites = mysqlTable("content_favorites", {
+    id: int("id").primaryKey().autoincrement(),
+    userId: int("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    contentId: int("content_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+    userContentIdx: uniqueIndex("user_content_idx").on(table.userId, table.contentId),
+    userIdx: index("favorite_user_idx").on(table.userId),
+    contentIdx: index("favorite_content_idx").on(table.contentId),
+}));
+/**
+ * Messaging System
+ */
+// Conversations (chat threads)
+export const conversations = mysqlTable("conversations", {
+    id: int("id").autoincrement().primaryKey(),
+    type: mysqlEnum("type", ["direct", "group"]).notNull(),
+    title: varchar("title", { length: 255 }), // For group chats
+    createdBy: int("createdBy").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+    lastMessageAt: timestamp("lastMessageAt"),
+}, (table) => ({
+    createdByIdx: index("conv_created_by_idx").on(table.createdBy),
+    lastMessageIdx: index("conv_last_message_idx").on(table.lastMessageAt),
+}));
+// Conversation participants
+export const conversationParticipants = mysqlTable("conversation_participants", {
+    id: int("id").autoincrement().primaryKey(),
+    conversationId: int("conversationId").notNull(),
+    userId: int("userId").notNull(),
+    joinedAt: timestamp("joinedAt").defaultNow().notNull(),
+    leftAt: timestamp("leftAt"),
+    lastReadAt: timestamp("lastReadAt"),
+}, (table) => ({
+    conversationIdx: index("part_conversation_idx").on(table.conversationId),
+    userIdx: index("part_user_idx").on(table.userId),
+    conversationUserIdx: uniqueIndex("part_conv_user_idx").on(table.conversationId, table.userId),
+}));
+// Messages
+export const messages = mysqlTable("messages", {
+    id: int("id").autoincrement().primaryKey(),
+    conversationId: int("conversationId").notNull(),
+    senderId: int("senderId").notNull(),
+    content: text("content").notNull(),
+    attachmentUrl: text("attachmentUrl"),
+    attachmentType: varchar("attachmentType", { length: 50 }),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+    deletedAt: timestamp("deletedAt"),
+}, (table) => ({
+    conversationIdx: index("msg_conversation_idx").on(table.conversationId),
+    senderIdx: index("msg_sender_idx").on(table.senderId),
+    createdIdx: index("msg_created_idx").on(table.createdAt),
+}));
+// Message read status
+export const messageReadStatus = mysqlTable("message_read_status", {
+    id: int("id").autoincrement().primaryKey(),
+    messageId: int("messageId").notNull(),
+    userId: int("userId").notNull(),
+    readAt: timestamp("readAt").defaultNow().notNull(),
+}, (table) => ({
+    messageIdx: index("read_message_idx").on(table.messageId),
+    userIdx: index("read_user_idx").on(table.userId),
+    messageUserIdx: uniqueIndex("read_msg_user_idx").on(table.messageId, table.userId),
+}));
+/**
+ * Student goals and targets
+ */
+export const studentGoals = mysqlTable("student_goals", {
+    id: int("id").autoincrement().primaryKey(),
+    studentId: int("studentId").notNull(),
+    goalType: varchar("goalType", { length: 50 }).notNull(), // 'exam_score', 'completion_date', 'topic_mastery'
+    targetValue: varchar("targetValue", { length: 255 }).notNull(), // '90%', '2025-06-30', 'algebra'
+    currentValue: varchar("currentValue", { length: 255 }),
+    deadline: timestamp("deadline"),
+    status: mysqlEnum("status", ["active", "achieved", "missed", "cancelled"]).default("active").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    studentIdx: index("student_idx").on(table.studentId),
+}));
+/**
+ * AI-generated progress predictions
+ */
+export const progressPredictions = mysqlTable("progress_predictions", {
+    id: int("id").autoincrement().primaryKey(),
+    studentId: int("studentId").notNull(),
+    goalId: int("goalId"),
+    predictionType: varchar("predictionType", { length: 50 }).notNull(), // 'completion_date', 'final_score', 'at_risk'
+    predictedValue: varchar("predictedValue", { length: 255 }).notNull(),
+    confidence: int("confidence"), // 0-100 confidence score
+    factors: json("factors"), // JSON array of contributing factors
+    recommendations: json("recommendations"), // JSON array of recommended actions
+    generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+}, (table) => ({
+    studentIdx: index("student_idx").on(table.studentId),
+    goalIdx: index("goal_idx").on(table.goalId),
+}));
+/**
+ * Bridge courses for catching up
+ */
+export const bridgeCourses = mysqlTable("bridge_courses", {
+    id: int("id").autoincrement().primaryKey(),
+    studentId: int("studentId").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    targetSkills: json("targetSkills"), // JSON array of skills to develop
+    difficulty: mysqlEnum("difficulty", ["beginner", "intermediate", "advanced"]).default("beginner").notNull(),
+    estimatedHours: int("estimatedHours"),
+    prerequisites: json("prerequisites"), // JSON array of prerequisite topics
+    content: json("content"), // JSON array of lessons/modules
+    status: mysqlEnum("status", ["recommended", "in_progress", "completed", "skipped"]).default("recommended").notNull(),
+    progress: int("progress").default(0), // 0-100
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    studentIdx: index("student_idx").on(table.studentId),
+}));
+/**
+ * Study materials uploaded by users for concept extraction
+ */
+export const studyMaterials = mysqlTable("study_materials", {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    fileType: varchar("fileType", { length: 50 }).notNull(), // 'text', 'pdf', 'image', 'url'
+    fileUrl: text("fileUrl"),
+    textContent: text("textContent"),
+    subject: varchar("subject", { length: 100 }),
+    topic: varchar("topic", { length: 255 }),
+    curriculum: varchar("curriculum", { length: 100 }),
+    processingStatus: mysqlEnum("processingStatus", ["pending", "processing", "completed", "failed"]).default("pending").notNull(),
+    conceptCount: int("conceptCount").default(0),
+    uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+    processedAt: timestamp("processedAt"),
+}, (table) => ({
+    userIdx: index("material_user_idx").on(table.userId),
+    statusIdx: index("material_status_idx").on(table.processingStatus),
+    subjectIdx: index("material_subject_idx").on(table.subject),
+}));
+/**
+ * Extracted concepts from study materials
+ */
+export const extractedConcepts = mysqlTable("extracted_concepts", {
+    id: int("id").autoincrement().primaryKey(),
+    materialId: int("materialId").notNull(),
+    conceptName: varchar("conceptName", { length: 255 }).notNull(),
+    definition: text("definition"),
+    explanation: text("explanation"),
+    examples: json("examples").$type(), // Array of example sentences/scenarios
+    category: varchar("category", { length: 100 }), // 'definition', 'formula', 'theorem', 'principle', 'fact'
+    importanceScore: int("importanceScore").default(50), // 0-100, higher = more important
+    difficulty: mysqlEnum("difficulty", ["beginner", "intermediate", "advanced"]),
+    keywords: json("keywords").$type(), // Related keywords for search
+    sourceContext: text("sourceContext"), // Original text where concept was found
+    position: int("position"), // Position in source material
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+    materialIdx: index("concept_material_idx").on(table.materialId),
+    nameIdx: index("concept_name_idx").on(table.conceptName),
+    importanceIdx: index("concept_importance_idx").on(table.importanceScore),
+    categoryIdx: index("concept_category_idx").on(table.category),
+}));
+/**
+ * Relationships between concepts
+ */
+export const conceptRelationships = mysqlTable("concept_relationships", {
+    id: int("id").autoincrement().primaryKey(),
+    conceptId: int("conceptId").notNull(),
+    relatedConceptId: int("relatedConceptId").notNull(),
+    relationshipType: varchar("relationshipType", { length: 50 }).notNull(), // 'prerequisite', 'related', 'opposite', 'example_of', 'part_of'
+    strength: int("strength").default(50), // 0-100, how strong is the relationship
+    description: text("description"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+    conceptIdx: index("rel_concept_idx").on(table.conceptId),
+    relatedIdx: index("rel_related_idx").on(table.relatedConceptId),
+    typeIdx: index("rel_type_idx").on(table.relationshipType),
+    conceptRelatedIdx: uniqueIndex("rel_concept_related_idx").on(table.conceptId, table.relatedConceptId),
+}));
+/**
+ * User-generated concept notes and annotations
+ */
+export const conceptNotes = mysqlTable("concept_notes", {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(),
+    conceptId: int("conceptId").notNull(),
+    noteText: text("noteText").notNull(),
+    isPublic: boolean("isPublic").default(false),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+    userIdx: index("note_user_idx").on(table.userId),
+    conceptIdx: index("note_concept_idx").on(table.conceptId),
+}));

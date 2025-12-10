@@ -1139,3 +1139,98 @@ export const bridgeCourses = mysqlTable("bridge_courses", {
 
 export type BridgeCourse = typeof bridgeCourses.$inferSelect;
 export type InsertBridgeCourse = typeof bridgeCourses.$inferInsert;
+
+
+/**
+ * Study materials uploaded by users for concept extraction
+ */
+export const studyMaterials = mysqlTable("study_materials", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  fileType: varchar("fileType", { length: 50 }).notNull(), // 'text', 'pdf', 'image', 'url'
+  fileUrl: text("fileUrl"),
+  textContent: text("textContent"),
+  subject: varchar("subject", { length: 100 }),
+  topic: varchar("topic", { length: 255 }),
+  curriculum: varchar("curriculum", { length: 100 }),
+  processingStatus: mysqlEnum("processingStatus", ["pending", "processing", "completed", "failed"]).default("pending").notNull(),
+  conceptCount: int("conceptCount").default(0),
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+  processedAt: timestamp("processedAt"),
+}, (table) => ({
+  userIdx: index("material_user_idx").on(table.userId),
+  statusIdx: index("material_status_idx").on(table.processingStatus),
+  subjectIdx: index("material_subject_idx").on(table.subject),
+}));
+
+export type StudyMaterial = typeof studyMaterials.$inferSelect;
+export type InsertStudyMaterial = typeof studyMaterials.$inferInsert;
+
+/**
+ * Extracted concepts from study materials
+ */
+export const extractedConcepts = mysqlTable("extracted_concepts", {
+  id: int("id").autoincrement().primaryKey(),
+  materialId: int("materialId").notNull(),
+  conceptName: varchar("conceptName", { length: 255 }).notNull(),
+  definition: text("definition"),
+  explanation: text("explanation"),
+  examples: json("examples").$type<string[]>(), // Array of example sentences/scenarios
+  category: varchar("category", { length: 100 }), // 'definition', 'formula', 'theorem', 'principle', 'fact'
+  importanceScore: int("importanceScore").default(50), // 0-100, higher = more important
+  difficulty: mysqlEnum("difficulty", ["beginner", "intermediate", "advanced"]),
+  keywords: json("keywords").$type<string[]>(), // Related keywords for search
+  sourceContext: text("sourceContext"), // Original text where concept was found
+  position: int("position"), // Position in source material
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  materialIdx: index("concept_material_idx").on(table.materialId),
+  nameIdx: index("concept_name_idx").on(table.conceptName),
+  importanceIdx: index("concept_importance_idx").on(table.importanceScore),
+  categoryIdx: index("concept_category_idx").on(table.category),
+}));
+
+export type ExtractedConcept = typeof extractedConcepts.$inferSelect;
+export type InsertExtractedConcept = typeof extractedConcepts.$inferInsert;
+
+/**
+ * Relationships between concepts
+ */
+export const conceptRelationships = mysqlTable("concept_relationships", {
+  id: int("id").autoincrement().primaryKey(),
+  conceptId: int("conceptId").notNull(),
+  relatedConceptId: int("relatedConceptId").notNull(),
+  relationshipType: varchar("relationshipType", { length: 50 }).notNull(), // 'prerequisite', 'related', 'opposite', 'example_of', 'part_of'
+  strength: int("strength").default(50), // 0-100, how strong is the relationship
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  conceptIdx: index("rel_concept_idx").on(table.conceptId),
+  relatedIdx: index("rel_related_idx").on(table.relatedConceptId),
+  typeIdx: index("rel_type_idx").on(table.relationshipType),
+  conceptRelatedIdx: uniqueIndex("rel_concept_related_idx").on(table.conceptId, table.relatedConceptId),
+}));
+
+export type ConceptRelationship = typeof conceptRelationships.$inferSelect;
+export type InsertConceptRelationship = typeof conceptRelationships.$inferInsert;
+
+/**
+ * User-generated concept notes and annotations
+ */
+export const conceptNotes = mysqlTable("concept_notes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  conceptId: int("conceptId").notNull(),
+  noteText: text("noteText").notNull(),
+  isPublic: boolean("isPublic").default(false),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdx: index("note_user_idx").on(table.userId),
+  conceptIdx: index("note_concept_idx").on(table.conceptId),
+}));
+
+export type ConceptNote = typeof conceptNotes.$inferSelect;
+export type InsertConceptNote = typeof conceptNotes.$inferInsert;

@@ -17,6 +17,7 @@ import { parentRouter } from "./routers-parent";
 import { superAdminRouter } from "./routers-superadmin";
 import { messagingRouter } from "./routers-messaging";
 import { navigationAssistantRouter } from "./routers/navigationAssistant.js";
+import { conceptExtractionRouter } from "./routers/conceptExtraction.js";
 // import { gamificationRouter } from "./routers/gamification.js";
 // import { spacedRepetitionRouter } from "./routers/spacedRepetition";
 
@@ -703,6 +704,7 @@ Provide a week-by-week breakdown with topics to cover.`,
   superadmin: superAdminRouter,
    messaging: messagingRouter,
   navigationAssistant: navigationAssistantRouter,
+  conceptExtraction: conceptExtractionRouter,
   
   // ============= GAMIFICATION =============
   // gamification: gamificationRouter,

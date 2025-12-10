@@ -2034,3 +2034,49 @@
 - [ ] Implement recurring class support
 - [ ] Add attendance tracking
 - [ ] Create class reminders system
+
+
+## AI-Powered Concept Extraction (New Feature - In Progress)
+
+### Database Schema
+- [ ] Create extracted_concepts table (id, material_id, concept_name, definition, importance_score)
+- [ ] Create concept_relationships table (id, concept_id, related_concept_id, relationship_type)
+- [ ] Create study_materials table (id, user_id, title, content, file_url, upload_date)
+- [ ] Add indexes for efficient querying
+
+### Backend Implementation
+- [ ] Create conceptExtraction tRPC router
+- [ ] Implement AI-powered text analysis with GPT-4
+- [ ] Add PDF text extraction support
+- [ ] Implement image OCR for concept extraction
+- [ ] Build concept relationship detection algorithm
+- [ ] Add automatic tagging and categorization
+- [ ] Implement importance scoring algorithm
+
+### Frontend UI
+- [ ] Create ConceptExtraction page
+- [ ] Build file upload interface (text, PDF, images)
+- [ ] Add concept visualization component (cards/graph)
+- [ ] Create concept relationship diagram
+- [ ] Implement concept filtering and search
+- [ ] Add export functionality (PDF, JSON)
+- [ ] Build integration with existing curriculum
+
+### Testing & Documentation
+- [ ] Write comprehensive vitest tests
+- [ ] Test with various file formats
+- [ ] Create user documentation
+- [ ] Add feature to navigation menu
+
+
+## Phase 38: AI-Powered Concept Extraction Feature (COMPLETED ✅)
+- [x] Design database schema for study materials and extracted concepts
+- [x] Create tRPC router with AI concept extraction logic
+- [x] Build upload interface for study materials
+- [x] Implement AI-powered concept extraction using GPT-4
+- [x] Create concept visualization UI with importance scoring
+- [x] Add concept relationship detection
+- [x] Implement user notes and annotations on concepts
+- [x] Write comprehensive vitest tests (14/14 passing)
+- [x] Add navigation integration in sidebar
+- [x] Compile TypeScript schema to JavaScript

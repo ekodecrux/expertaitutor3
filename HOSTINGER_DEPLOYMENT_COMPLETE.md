@@ -212,6 +212,24 @@ node server/seed-neet-optimized.mjs
 node server/seed-demo-users.mjs
 ```
 
+### 2.7 Verify Concept Extraction Dependencies
+The platform includes AI-powered concept extraction with OCR support. Verify these packages are installed:
+```bash
+# Check if OCR dependencies are installed
+pnpm list pdf-parse tesseract.js anki-apkg-export
+
+# If missing, install them
+pnpm add pdf-parse tesseract.js anki-apkg-export
+```
+
+**Features included:**
+- PDF text extraction
+- Image OCR (Tesseract.js)
+- Batch file upload (up to 10 files)
+- Auto-extraction after upload
+- Full-text concept search with filters
+- Anki flashcard deck export (.apkg)
+
 ---
 
 ## Part 3: PM2 Process Management (10 minutes)

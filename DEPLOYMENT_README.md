@@ -87,7 +87,7 @@ This guide includes:
 
 ## 🎯 Platform Features
 
-### Core Features (95% Complete)
+### Core Features (98% Complete)
 - ✅ Multi-role authentication (Student/Teacher/Parent/Admin/Super Admin)
 - ✅ AI-powered conversational tutor with GPT-4
 - ✅ Exam-specific curriculum (UCAT, JEE, NEET, CBSE, ICSE, GMAT, etc.)
@@ -106,6 +106,9 @@ This guide includes:
 - ✅ Profile photo upload
 - ✅ Content library with approval workflow
 - ✅ Stripe payment integration
+- ✅ **AI Concept Extraction** (PDF/Image OCR, batch upload, auto-extraction)
+- ✅ **Concept Search** (full-text search with 6 filters)
+- ✅ **Anki Flashcard Export** (.apkg generation for spaced repetition)
 
 ### Content Database
 - ✅ UCAT: 650+ questions (5 subjects)

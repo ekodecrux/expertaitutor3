@@ -17,6 +17,7 @@ import { parentRouter } from "./routers-parent";
 import { superAdminRouter } from "./routers-superadmin";
 import { messagingRouter } from "./routers-messaging";
 // import { gamificationRouter } from "./routers/gamification";
+// import { spacedRepetitionRouter } from "./routers/spacedRepetition";
 
 // ============= RBAC MIDDLEWARE =============
 
@@ -704,7 +705,10 @@ Provide a week-by-week breakdown with topics to cover.`,
    messaging: messagingRouter,
   
   // ============= GAMIFICATION =============
-  // gamification: gamificationRouter, // Temporarily disabled for build
+  // gamification: gamificationRouter,
+  
+  // ============= SPACED REPETITION =============
+  // spacedRepetition: spacedRepetitionRouter,
   
   // ============= FILE UPLOAD =============
   

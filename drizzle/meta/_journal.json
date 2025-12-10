@@ -71,6 +71,13 @@
       "when": 1765332546536,
       "tag": "0009_pretty_prowler",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1765335173985,
+      "tag": "0010_adorable_purifiers",
+      "breakpoints": true
     }
   ]
 }

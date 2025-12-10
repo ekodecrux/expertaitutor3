@@ -534,6 +534,70 @@ export const milestones = mysqlTable("milestones", {
 export type Milestone = typeof milestones.$inferSelect;
 
 /**
+ * Spaced Repetition System - Review schedules based on Ebbinghaus forgetting curve
+ */
+export const reviewSchedules = mysqlTable("review_schedules", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull(),
+  topicId: int("topicId"),
+  conceptId: int("conceptId"),
+  questionId: int("questionId"),
+  contentType: mysqlEnum("contentType", ["topic", "concept", "question"]).notNull(),
+  
+  // Spaced repetition algorithm fields
+  easeFactor: decimal("easeFactor", { precision: 3, scale: 2 }).default("2.50").notNull(), // 1.3-2.5+
+  interval: int("interval").default(1).notNull(), // Days until next review
+  repetitions: int("repetitions").default(0).notNull(), // Number of successful reviews
+  
+  // Review timing
+  lastReviewedAt: timestamp("lastReviewedAt"),
+  nextReviewAt: timestamp("nextReviewAt").notNull(),
+  dueStatus: mysqlEnum("dueStatus", ["not_due", "due_soon", "due_now", "overdue"]).default("not_due").notNull(),
+  
+  // Performance tracking
+  totalReviews: int("totalReviews").default(0),
+  successfulReviews: int("successfulReviews").default(0),
+  averageScore: int("averageScore"), // 0-100
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  studentIdx: index("student_idx").on(table.studentUserId),
+  nextReviewIdx: index("next_review_idx").on(table.nextReviewAt),
+  dueStatusIdx: index("due_status_idx").on(table.dueStatus),
+}));
+
+export type ReviewSchedule = typeof reviewSchedules.$inferSelect;
+
+/**
+ * Review session history
+ */
+export const reviewSessions = mysqlTable("review_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  studentUserId: int("studentUserId").notNull(),
+  scheduleId: int("scheduleId").notNull(),
+  
+  // Session details
+  score: int("score").notNull(), // 0-100
+  timeSpentSeconds: int("timeSpentSeconds"),
+  difficulty: mysqlEnum("difficulty", ["again", "hard", "good", "easy"]).notNull(),
+  
+  // Algorithm updates
+  oldInterval: int("oldInterval"),
+  newInterval: int("newInterval"),
+  oldEaseFactor: decimal("oldEaseFactor", { precision: 3, scale: 2 }),
+  newEaseFactor: decimal("newEaseFactor", { precision: 3, scale: 2 }),
+  
+  reviewedAt: timestamp("reviewedAt").defaultNow().notNull(),
+}, (table) => ({
+  studentIdx: index("student_idx").on(table.studentUserId),
+  scheduleIdx: index("schedule_idx").on(table.scheduleId),
+  dateIdx: index("date_idx").on(table.reviewedAt),
+}));
+
+export type ReviewSession = typeof reviewSessions.$inferSelect;
+
+/**
  * Learning activity logs
  */
 export const activityLogs = mysqlTable("activity_logs", {

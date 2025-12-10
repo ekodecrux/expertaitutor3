@@ -1696,3 +1696,217 @@
 - [ ] Implement blockchain certificate issuance for course completion
 - [ ] Create certificate verification portal
 - [ ] Add NFT badges for achievements
+
+
+## 🎯 NEW FEATURES - Current Sprint
+
+### Brand Update
+- [ ] Change brand name from "AI Tutor" to "AI Professor" throughout platform
+- [ ] Update app title in environment variables
+- [ ] Update all UI text references
+- [ ] Update email templates
+
+### Complete Gamification Frontend
+- [ ] Restore gamification router to main routers.ts
+- [ ] Wire up enhanced Rewards page with all 12 backend APIs
+- [ ] Test streak tracking, freeze, and rewards
+- [ ] Test leaderboards (class/school/global)
+- [ ] Test virtual currency system
+- [ ] Test milestone celebrations
+
+### Spaced Repetition System (Century Tech)
+- [ ] Create database schema for review schedules
+- [ ] Implement Ebbinghaus forgetting curve algorithm
+- [ ] Build backend API for review scheduling
+- [ ] Create frontend review dashboard
+- [ ] Add "Due for Review" notifications
+- [ ] Implement review session UI
+
+### Video Content Library (Khan Academy)
+- [ ] Create video database schema
+- [ ] Build YouTube video integration
+- [ ] Create video player component
+- [ ] Add video search and filtering
+- [ ] Link videos to curriculum topics
+- [ ] Add video progress tracking
+
+
+## 🎯 EXAM-SPECIFIC CONTENT SYSTEM (HIGH PRIORITY)
+
+### Database Schema
+- [ ] Create exam_templates table (CBSE, ICSE, JEE, NEET, GMAT, CAT, GRE, TOEFL, UCAT, Saudi University)
+- [ ] Add exam_curriculum table (subjects, topics, weightage per exam)
+- [ ] Add student_target_exam field to link students to specific exams
+- [ ] Create exam_study_plans table (customized plans per exam)
+
+### Exam Content Seed Data
+- [ ] CBSE Class 12 - Physics, Chemistry, Maths, Biology (full curriculum)
+- [ ] ICSE Class 12 - Physics, Chemistry, Maths, Biology (full curriculum)
+- [ ] JEE Main/Advanced - Physics, Chemistry, Maths (topic-wise breakdown)
+- [ ] NEET - Physics, Chemistry, Biology (NCERT-based)
+- [ ] GMAT - Quantitative, Verbal, Integrated Reasoning, AWA
+- [ ] CAT - Quantitative Aptitude, VARC, DILR
+- [ ] GRE - Verbal, Quantitative, AWA
+- [ ] TOEFL - Reading, Listening, Speaking, Writing
+- [ ] UCAT - Verbal Reasoning, Decision Making, Quantitative, Abstract, Situational
+- [ ] Saudi University Admissions - Qiyas (Quantitative, Verbal), Tahsili (Science subjects)
+
+### Demo Student Accounts
+- [ ] Create demo_cbse@example.com (CBSE Class 12, 60% progress)
+- [ ] Create demo_icse@example.com (ICSE Class 12, 55% progress)
+- [ ] Create demo_jee@example.com (JEE preparation, 70% progress)
+- [ ] Create demo_neet@example.com (NEET preparation, 65% progress)
+- [ ] Create demo_gmat@example.com (GMAT preparation, 50% progress)
+- [ ] Create demo_cat@example.com (CAT preparation, 45% progress)
+- [ ] Create demo_gre@example.com (GRE preparation, 60% progress)
+- [ ] Create demo_toefl@example.com (TOEFL preparation, 75% progress)
+- [ ] Create demo_ucat@example.com (UCAT preparation, 55% progress)
+- [ ] Create demo_saudi@example.com (Saudi University prep, 50% progress)
+
+### Frontend Exam Selection
+- [ ] Create exam selection page (onboarding for new students)
+- [ ] Build exam-specific dashboard (shows relevant subjects only)
+- [ ] Add exam countdown timer
+- [ ] Show exam-specific study plan
+- [ ] Display exam-specific practice tests
+
+### Institute Admin Controls
+- [ ] Add "Assign Target Exam" feature in admin panel
+- [ ] Bulk assign students to exams
+- [ ] View students by target exam
+- [ ] Generate exam-specific reports
+
+
+## 🌐 WEB SCRAPING & CONTENT GENERATION (HIGH PRIORITY)
+
+### Web Scraping System
+- [ ] Build web scraper for Khan Academy (videos, practice questions)
+- [ ] Scrape NCERT textbooks (PDF to structured content)
+- [ ] Scrape previous year papers (JEE, NEET, CBSE, ICSE)
+- [ ] Scrape GMAT/GRE/CAT question banks
+- [ ] Scrape TOEFL/UCAT practice materials
+- [ ] Create scraping_queue table for batch processing
+- [ ] Add content deduplication system
+- [ ] Build content quality validation (AI-powered)
+
+### Massive Content Library
+- [ ] Generate 10,000+ practice questions using AI (per exam)
+- [ ] Create 500+ video lesson scripts
+- [ ] Build 200+ topic-wise assessments
+- [ ] Add 100+ full-length mock tests
+- [ ] Create solutions and explanations for all questions
+- [ ] Add difficulty levels (easy/medium/hard)
+- [ ] Tag content by topic, subtopic, concept
+
+### 12-Month Lesson Plans
+- [ ] Create month-by-month curriculum breakdown (all 10 exams)
+- [ ] Add weekly milestones and checkpoints
+- [ ] Build adaptive pacing (auto-adjust based on performance)
+- [ ] Create revision schedules (spaced repetition integrated)
+- [ ] Add buffer weeks for weak topics
+- [ ] Generate personalized study calendars
+
+### Daily Lesson Plans (AI Professor Page)
+- [ ] Create "Today's Lesson" page with AI narration
+- [ ] Add lesson objectives and learning outcomes
+- [ ] Include warm-up questions
+- [ ] Add detailed concept explanation (AI-generated)
+- [ ] Include worked examples
+- [ ] Add practice problems
+- [ ] Include homework assignments
+- [ ] Add "Ask AI Professor" chat for doubts
+- [ ] Track lesson completion and time spent
+
+### Auto-Generated Assessments
+- [ ] Topic-wise quizzes (10 questions each)
+- [ ] Chapter tests (25-50 questions)
+- [ ] Full-length mock tests (exam pattern)
+- [ ] Adaptive difficulty (gets harder/easier based on performance)
+- [ ] Instant feedback and solutions
+- [ ] Performance analytics (weak areas, time management)
+- [ ] Comparison with peers (percentile)
+
+
+## 🤖 AI ASSESSMENT ANALYSIS (AI TOOLS)
+
+### Performance Analysis Dashboard
+- [ ] Create AI-powered assessment analysis page
+- [ ] Show overall score breakdown (subject-wise, topic-wise)
+- [ ] Identify top 5 strengths (topics with >80% accuracy)
+- [ ] Identify top 5 weaknesses (topics with <50% accuracy)
+- [ ] Generate personalized improvement plan
+- [ ] Show time spent per question (speed analysis)
+- [ ] Calculate accuracy vs speed trade-off
+
+### Mistake Pattern Recognition
+- [ ] Detect recurring mistake types (conceptual, calculation, careless)
+- [ ] Identify question types where student struggles
+- [ ] Track improvement over time (mistake reduction %)
+- [ ] Generate targeted practice sets for weak areas
+- [ ] AI-generated explanations for common mistakes
+
+### Comparative Analytics
+- [ ] Compare with class average
+- [ ] Compare with school/institute average
+- [ ] Compare with top 10% performers
+- [ ] Show percentile ranking
+- [ ] Display subject-wise rank
+- [ ] Peer comparison charts (anonymized)
+
+### Predictive Scoring
+- [ ] Estimate final exam score based on current performance
+- [ ] Show probability of achieving target score
+- [ ] Calculate required improvement rate
+- [ ] Generate "Path to Success" roadmap
+- [ ] Show weekly improvement trends
+- [ ] Predict exam readiness date
+
+### Time Management Analysis
+- [ ] Average time per question (by difficulty level)
+- [ ] Identify questions taking too long
+- [ ] Suggest optimal time allocation
+- [ ] Track improvement in speed over time
+- [ ] Show accuracy vs time spent correlation
+- [ ] Generate time management tips
+
+### AI Recommendations
+- [ ] "Focus on these 3 topics this week"
+- [ ] "You're ready for harder questions in [topic]"
+- [ ] "Revise [concept] - you've forgotten it"
+- [ ] "Practice more [question type]"
+- [ ] "Your exam strategy: [personalized tips]"
+- [ ] Daily AI-generated study suggestions
+
+
+## 📹 VIDEO CLASS SCHEDULING (TEACHER TOOLS)
+
+### Zoom/Google Meet Integration
+- [ ] Add Zoom OAuth integration
+- [ ] Add Google Meet OAuth integration
+- [ ] Create video_classes table (teacher, students, datetime, link, recording)
+- [ ] Build class scheduling interface for teachers
+- [ ] Add calendar view for scheduled classes
+- [ ] Send automatic reminders (email + in-app)
+- [ ] Generate meeting links automatically
+- [ ] Record attendance tracking
+- [ ] Store class recordings (S3)
+- [ ] Add student join links (one-click join)
+
+### Teacher Class Management
+- [ ] Create "Schedule Class" page
+- [ ] Add recurring class support (daily/weekly)
+- [ ] Bulk schedule classes for entire batch
+- [ ] Add class materials upload (slides, notes)
+- [ ] Post-class assignment creation
+- [ ] Class feedback collection from students
+- [ ] View class analytics (attendance, engagement)
+
+## 🎨 UI/UX FIXES
+
+### Layout Fixes
+- [ ] Move web scraping/content management to bottom of admin panel
+- [ ] Ensure all pages fit 100% screen height (no vertical scroll unless needed)
+- [ ] Fix logout button position (keep visible at bottom)
+- [ ] Optimize sidebar navigation (collapse/expand)
+- [ ] Add breadcrumbs for navigation clarity
+- [ ] Ensure mobile responsiveness for all new pages

@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import NavigationAssistant from "@/components/NavigationAssistant";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -495,6 +496,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <NavigationAssistant />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
